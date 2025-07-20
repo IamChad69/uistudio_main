@@ -194,7 +194,7 @@ browser.commands.onCommand.addListener(async (command) => {
 
 // Listen for messages from content scripts
 browser.runtime.onMessage.addListener(
-  (message: unknown, sender: browser.Runtime.MessageSender) => {
+  async (message: unknown, sender: browser.Runtime.MessageSender) => {
     // Safely cast message if it passes our type guard
     if (isExtensionMessage(message)) {
       const tabId = sender.tab?.id;
@@ -205,18 +205,90 @@ browser.runtime.onMessage.addListener(
         return false; // Not expecting async response for malformed message
       }
 
-      // Track extension closed state
-      if (message.action === EXTENSION_UI_CLOSED_ACTION) {
-        console.log(`[uiScraper] Extension UI closed in tab: ${tabId}`);
-        extensionVisibilityState[tabId] = false;
+      // Handle different actions
+      switch (message.action) {
+        case "createAuthTab":
+          try {
+            console.log("[uiScraper] Creating auth tab...");
+            const url = (message as any).url;
+            if (!url) {
+              console.error("[uiScraper] No URL provided for auth tab");
+              return { success: false, error: "No URL provided" };
+            }
+
+            const newTab = await browser.tabs.create({ url });
+            console.log("[uiScraper] Auth tab created:", newTab.id);
+            return { success: true, tabId: newTab.id };
+          } catch (error) {
+            console.error("[uiScraper] Error creating auth tab:", error);
+            return {
+              success: false,
+              error: error instanceof Error ? error.message : "Unknown error",
+            };
+          }
+
+        case "closeTab":
+          try {
+            const tabIdToClose = (message as any).tabId;
+            if (tabIdToClose) {
+              await browser.tabs.remove(tabIdToClose);
+              console.log("[uiScraper] Tab closed:", tabIdToClose);
+            }
+            return { success: true };
+          } catch (error) {
+            console.error("[uiScraper] Error closing tab:", error);
+            return {
+              success: false,
+              error: error instanceof Error ? error.message : "Unknown error",
+            };
+          }
+
+        case "refreshExtensionState":
+          try {
+            console.log("[uiScraper] Refreshing extension state...");
+            // Send message to all content scripts to refresh their state
+            const tabs = await browser.tabs.query({});
+            for (const tab of tabs) {
+              if (tab.id) {
+                try {
+                  await browser.tabs.sendMessage(tab.id, {
+                    action: "refreshExtensionState",
+                  });
+                } catch (error) {
+                  // Ignore errors for tabs that don't have content scripts
+                  console.debug(
+                    `[uiScraper] Could not send message to tab ${tab.id}:`,
+                    error
+                  );
+                }
+              }
+            }
+            return { success: true };
+          } catch (error) {
+            console.error(
+              "[uiScraper] Error refreshing extension state:",
+              error
+            );
+            return {
+              success: false,
+              error: error instanceof Error ? error.message : "Unknown error",
+            };
+          }
+
+        case EXTENSION_UI_CLOSED_ACTION:
+          console.log(`[uiScraper] Extension UI closed in tab: ${tabId}`);
+          extensionVisibilityState[tabId] = false;
+          return true;
+
+        case EXTENSION_UI_SHOWN_ACTION:
+          console.log(`[uiScraper] Extension UI shown in tab: ${tabId}`);
+          extensionVisibilityState[tabId] = true;
+          return true;
+
+        default:
+          console.warn(`[uiScraper] Unhandled action: ${message.action}`);
+          return false;
       }
-      // Track extension shown state
-      else if (message.action === EXTENSION_UI_SHOWN_ACTION) {
-        console.log(`[uiScraper] Extension UI shown in tab: ${tabId}`);
-        extensionVisibilityState[tabId] = true;
-      }
-      // Add more internal message handling here if needed
-      return true; // Indicate we might respond asynchronously, or just acknowledging receipt
     }
     console.warn(
       "[uiScraper] Received unhandled or malformed internal message:",

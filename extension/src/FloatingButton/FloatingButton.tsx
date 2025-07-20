@@ -18,6 +18,7 @@ import { Tooltip } from "../_components/Tooltip";
 import LogoIcon from "../assets/icons/logo-icon.svg";
 import { AuthModal } from "../_components/AuthModal";
 import { useAuth } from "../hooks/useAuth";
+import SettingsModal from "../_components/Settings/SettingsModal";
 
 // Custom upgrade tooltip component that shows as a chat bubble with upgrade button
 interface UpgradeTooltipProps {
@@ -26,6 +27,7 @@ interface UpgradeTooltipProps {
   children: React.ReactNode;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const UpgradeTooltip: React.FC<UpgradeTooltipProps> = ({
   onUpgrade,
   position = "left",
@@ -568,11 +570,28 @@ function FloatingButton({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
+  const [authStateChanged, setAuthStateChanged] = useState(false);
+  const [buttonPosition, setButtonPosition] = useState<
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined
+  >(undefined);
   const constraintsRef = useRef(null);
   const starButtonRef = useRef<HTMLButtonElement>(null);
   const buttonContainerRef = useRef<HTMLDivElement>(null);
 
-  const { isAuthenticated, user, loading } = useAuth();
+  const { isAuthenticated, user, loading, checkAuth } = useAuth();
+
+  // Handle auth state changes
+  useEffect(() => {
+    if (authStateChanged) {
+      // Refresh auth state
+      checkAuth();
+      setAuthStateChanged(false);
+    }
+  }, [authStateChanged, checkAuth]);
 
   // Function to apply hover effect to an icon button
   const handleButtonHover = (element: HTMLElement, isHovering: boolean) => {
@@ -582,7 +601,16 @@ function FloatingButton({
       : "transparent";
   };
 
-  const handleToggleSettings = () => setIsSettingsModalOpen((open) => !open);
+  const handleToggleSettings = () => {
+    if (buttonContainerRef.current) {
+      const rect = buttonContainerRef.current.getBoundingClientRect();
+      setButtonPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+    }
+    setIsSettingsModalOpen((open) => !open);
+  };
 
   // Handle auth button click
   const handleAuthClick = () => {
@@ -925,7 +953,7 @@ function FloatingButton({
                       }
                       onFocus={(e) => handleButtonHover(e.currentTarget, true)}
                       onBlur={(e) => handleButtonHover(e.currentTarget, false)}
-                      //onClick={handleToggleSettings}
+                      onClick={handleToggleSettings}
                     >
                       <Settings size={16} />
                     </button>
@@ -988,11 +1016,13 @@ function FloatingButton({
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        onAuthStateChange={() => setAuthStateChanged(true)}
       />
-      {/* <SettingsModal
+      <SettingsModal
         open={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
-      /> */}
+        buttonPosition={buttonPosition}
+      />
       {/* {isAiChatOpen && (
         Ai chat
       )} */}

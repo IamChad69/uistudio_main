@@ -528,6 +528,9 @@ class ContentScript {
       // If we received an auth token, update the auth state
       if (authToken) {
         this.updateAuthState(authToken);
+      } else {
+        // If no auth token provided, this might be a logout - clear auth state
+        this.clearAuthState();
       }
 
       // Re-render components to reflect new authentication state
@@ -563,6 +566,28 @@ class ContentScript {
       }
     } catch (error) {
       logger.error("Error updating auth state:", error);
+    }
+  }
+
+  // Clear authentication state
+  private clearAuthState(): void {
+    logger.info("Clearing authentication state");
+    try {
+      // Remove the token from local storage
+      browser.storage.local.remove("authToken").then(() => {
+        logger.info("Auth token removed from local storage");
+      });
+
+      // Update the auth state in the UI
+      if (this.reactRoot) {
+        const rootElement = this.reactRoot as unknown as HTMLElement;
+        const event = new CustomEvent("authStateChanged", {
+          detail: { isAuthenticated: false, token: null },
+        });
+        rootElement.dispatchEvent(event);
+      }
+    } catch (error) {
+      logger.error("Error clearing auth state:", error);
     }
   }
 

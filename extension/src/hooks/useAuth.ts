@@ -36,6 +36,46 @@ export const useAuth = () => {
 
   useEffect(() => {
     checkAuth();
+
+    // Listen for auth state changes from ContentScript
+    const handleAuthStateChange = (event: CustomEvent) => {
+      const { isAuthenticated: newAuthState, token } = event.detail;
+
+      if (newAuthState && token) {
+        // User is authenticated
+        setState({
+          isAuthenticated: true,
+          user: null, // Will be populated by checkAuth
+          loading: false,
+          error: null,
+          subscriptionPlan: undefined,
+        });
+        // Re-check auth to get user details
+        checkAuth();
+      } else {
+        // User is not authenticated
+        setState({
+          isAuthenticated: false,
+          user: null,
+          loading: false,
+          error: null,
+          subscriptionPlan: undefined,
+        });
+      }
+    };
+
+    // Add event listener
+    document.addEventListener(
+      "authStateChanged",
+      handleAuthStateChange as EventListener
+    );
+
+    return () => {
+      document.removeEventListener(
+        "authStateChanged",
+        handleAuthStateChange as EventListener
+      );
+    };
   }, []);
 
   const checkAuth = async () => {
