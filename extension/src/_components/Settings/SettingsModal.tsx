@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import ProfileSettings from "./_components/ProfileSettings";
 import AppearanceSettings from "./_components/AppearanceSettings";
+import WorkflowSettings from "./_components/WorkflowSettings";
 
 interface SettingsModalProps {
   open: boolean;
@@ -30,7 +31,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   buttonPosition,
 }) => {
-  const [activeTab, setActiveTab] = useState<number>(-1); // Start with no tab open
+  const [activeTab, setActiveTab] = useState<number>(0); // Start with Profile tab open
 
   if (!open) return null;
 
@@ -123,17 +124,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 {isActive && (
                   <div style={styles.accordionContent}>
                     {idx === 0 && <ProfileSettings />}
-                    {idx === 2 && <AppearanceSettings />}
-                    {idx === 3 && (
-                      <div style={styles.placeholder}>
-                        Account settings placeholder
-                      </div>
-                    )}
-                    {idx === 1 && (
-                      <div style={styles.placeholder}>
-                        Notifications settings placeholder
-                      </div>
-                    )}
+                    {idx === 1 && <AppearanceSettings />}
+                    {idx === 2 && <WorkflowSettings />}
                   </div>
                 )}
               </div>
@@ -166,6 +158,7 @@ const styles = {
     alignItems: "flex-end",
     justifyContent: "flex-end",
     padding: "20px",
+    pointerEvents: "auto" as const,
   },
   modal: {
     background: "#000000",

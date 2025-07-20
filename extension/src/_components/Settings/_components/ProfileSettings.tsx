@@ -14,7 +14,6 @@ const ProfileSettings: React.FC = () => {
   } = useUsage();
 
   // Get plan info from auth (more reliable than usage API)
-  const userPlan = user?.plan || "free";
   const hasProAccess = user?.hasProAccess || false;
 
   if (!isAuthenticated || !user) {
