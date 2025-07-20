@@ -1,0 +1,105 @@
+{
+  "manifest_version": 3,
+  "name": "uiScraper_saas",
+  "version": "1.0.0",
+
+  "icons": {
+    "16": "assets/icons/favicon-16.png",
+    "32": "assets/icons/favicon-32.png",
+    "48": "assets/icons/favicon-48.png",
+    "128": "assets/icons/favicon-128.png"
+  },
+  "description": "Cross-browser web scraping tool for extracting UI elements and data from websites",
+  "homepage_url": "https://github.com/uiScraper/uiScraper",
+  "short_name": "uiScraper",
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "downloads",
+    "commands",
+    "contextMenus"
+  ],
+
+  "host_permissions": ["http://*/*", "https://*/*"],
+
+  "externally_connectable": {
+    "matches": ["<all_urls>"]
+  },
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+
+  "__chrome|firefox__author": "uiScraper Team",
+  "__opera__developer": {
+    "name": "uiScraper Team"
+  },
+
+  "__firefox__applications": {
+    "gecko": {
+      "id": "{uiScraper-extension-id}"
+    }
+  },
+
+  "__chrome__minimum_chrome_version": "88",
+  "__opera__minimum_opera_version": "74",
+  "__firefox__minimum_firefox_version": "78",
+  "__edge__minimum_edge_version": "88",
+
+  "action": {
+    "default_icon": {
+      "16": "assets/icons/favicon-16.png",
+      "32": "assets/icons/favicon-32.png",
+      "48": "assets/icons/favicon-48.png",
+      "128": "assets/icons/favicon-128.png"
+    },
+    "default_title": "uiScraper"
+  },
+
+  "background": {
+    "service_worker": "js/background.bundle.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["js/contentScript.bundle.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "commands": {
+    "toggle-scraping": {
+      "suggested_key": {
+        "default": "Alt+C",
+        "mac": "Alt+C",
+        "windows": "Alt+C",
+        "linux": "Alt+C",
+        "chromeos": "Alt+C"
+      },
+      "description": "Toggle scraping mode"
+    },
+    "start-font-inspection": {
+      "suggested_key": {
+        "default": "Alt+F",
+        "mac": "Alt+F",
+        "windows": "Alt+F",
+        "linux": "Alt+F",
+        "chromeos": "Alt+F"
+      },
+      "description": "Start font inspection mode"
+    },
+    "start-color-picker": {
+      "suggested_key": {
+        "default": "Alt+P",
+        "mac": "Alt+P",
+        "windows": "Alt+P",
+        "linux": "Alt+P",
+        "chromeos": "Alt+P"
+      },
+      "description": "Start color picker mode"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+# This is a config for E2B sandbox template.
+# You can use template ID (frf1i78pst4csn423okt) or template name (uiscraper-nextjs-v2) to create a sandbox:
+
+# Python SDK
+# from e2b import Sandbox, AsyncSandbox
+# sandbox = Sandbox("uiscraper-nextjs-v2") # Sync sandbox
+# sandbox = await AsyncSandbox.create("uiscraper-nextjs-v2") # Async sandbox
+
+# JS SDK
+# import { Sandbox } from 'e2b'
+# const sandbox = await Sandbox.create('uiscraper-nextjs-v2')
+
+team_id = "72cd52ca-b2eb-4e1e-b47a-9bb754194814"
+start_cmd = "/compile_page.sh"
+dockerfile = "e2b.Dockerfile"
+template_name = "uiscraper-nextjs-v2"
+template_id = "frf1i78pst4csn423okt"
