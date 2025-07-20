@@ -21,9 +21,8 @@ interface SettingsModalProps {
 
 const TABS = [
   { label: "Profile", icon: User },
-  { label: "Notifications", icon: Bell },
   { label: "Appearance", icon: Palette },
-  { label: "Account", icon: Settings },
+  { label: "Workflows", icon: Settings },
 ];
 
 const SettingsModal: React.FC<SettingsModalProps> = ({

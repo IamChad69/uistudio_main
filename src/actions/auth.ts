@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 
 export async function onAuthenticateUser() {
@@ -7,6 +7,10 @@ export async function onAuthenticateUser() {
     if (!user) {
       return { status: 403 };
     }
+
+    // Get the user's subscription status from Clerk
+    const { has } = await auth();
+    const hasProAccess = has({ plan: "pro" });
 
     // Since we don't have a separate User model, we'll return the Clerk user data
     // The system uses Clerk user ID directly in the Project model
@@ -17,6 +21,8 @@ export async function onAuthenticateUser() {
         email: user.emailAddresses[0]?.emailAddress,
         name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
         profileImage: user.imageUrl,
+        plan: hasProAccess ? "pro" : "free",
+        hasProAccess,
       },
     };
   } catch (error) {
@@ -71,6 +77,8 @@ export async function verifyExtensionAuthToken(token: string) {
         email: decodedData.email,
         name: decodedData.name,
         profileImage: decodedData.profileImage,
+        plan: decodedData.plan || "free",
+        hasProAccess: decodedData.hasProAccess || false,
       },
     };
   } catch (error) {

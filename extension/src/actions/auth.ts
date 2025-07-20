@@ -1,4 +1,5 @@
 import config from "../config/environment";
+import browser from "webextension-polyfill";
 
 interface User {
   id: string;
@@ -8,6 +9,8 @@ interface User {
   fullName?: string;
   firstName?: string;
   lastName?: string;
+  plan?: string;
+  totalPoints?: number;
   subscription?: {
     plan: {
       name: string;
@@ -23,25 +26,26 @@ interface AuthResponse {
   error?: string;
 }
 
-// Store the auth token in chrome.storage.local
+// Store the auth token in browser.storage.local
 export const storeAuthToken = async (token: string): Promise<void> => {
   console.log("🔍 Storing auth token...");
-  await chrome.storage.local.set({ authToken: token });
+  await browser.storage.local.set({ authToken: token });
   console.log("🔍 Auth token stored successfully");
 };
 
 // Get the stored auth token
 export const getAuthToken = async (): Promise<string | null> => {
   console.log("🔍 Getting stored auth token...");
-  const result = await chrome.storage.local.get("authToken");
-  console.log("🔍 Token found:", !!result.authToken);
-  return result.authToken || null;
+  const result = await browser.storage.local.get("authToken");
+  const authToken = result.authToken as string | undefined;
+  console.log("🔍 Token found:", !!authToken);
+  return authToken || null;
 };
 
 // Remove the stored auth token
 export const removeAuthToken = async (): Promise<void> => {
   console.log("🔍 Removing auth token...");
-  await chrome.storage.local.remove("authToken");
+  await browser.storage.local.remove("authToken");
   console.log("🔍 Auth token removed");
 };
 
@@ -88,6 +92,8 @@ export const verifyToken = async (token: string): Promise<AuthResponse> => {
     console.log("🔍 Token verification response:", {
       status: data.status,
       hasUser: !!data.user,
+      userPlan: data.user?.plan,
+      totalPoints: data.user?.totalPoints,
     });
     return data;
   } catch (error) {
@@ -110,6 +116,8 @@ export const getCurrentUser = async (): Promise<AuthResponse> => {
     console.log("🔍 Current user result:", {
       status: result.status,
       hasUser: !!result.user,
+      userPlan: result.user?.plan,
+      totalPoints: result.user?.totalPoints,
     });
     return result;
   } catch (error) {
@@ -144,6 +152,8 @@ export const handleWebAppAuth = async (
     console.log("🔍 Token verification result:", {
       status: verificationResponse.status,
       hasUser: !!verificationResponse.user,
+      userPlan: verificationResponse.user?.plan,
+      totalPoints: verificationResponse.user?.totalPoints,
     });
 
     if (verificationResponse.status !== 200) {

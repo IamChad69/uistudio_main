@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 // Helper function to add CORS headers to responses
@@ -58,6 +58,14 @@ export async function GET(request: Request) {
       );
     }
 
+    // Get the user's subscription status from Clerk using the same method as the web app
+    const { has } = await auth();
+    const hasProAccess = has({ plan: "pro" });
+    const userPlan = hasProAccess ? "pro" : "free";
+    const totalPoints = hasProAccess ? 100 : 3;
+
+    console.log("🔍 User plan:", userPlan, "Total points:", totalPoints);
+
     // Generate a secure token for extension authentication
     const token = Buffer.from(
       JSON.stringify({
@@ -65,6 +73,9 @@ export async function GET(request: Request) {
         email: user.emailAddresses[0].emailAddress,
         name: user.firstName + " " + user.lastName,
         profileImage: user.imageUrl,
+        plan: userPlan,
+        hasProAccess: hasProAccess,
+        totalPoints: totalPoints,
         timestamp: Date.now(),
       })
     ).toString("base64");
@@ -79,6 +90,9 @@ export async function GET(request: Request) {
           email: user.emailAddresses[0].emailAddress,
           name: user.firstName + " " + user.lastName,
           profileImage: user.imageUrl,
+          plan: userPlan,
+          hasProAccess: hasProAccess,
+          totalPoints: totalPoints,
         },
       }),
       request
@@ -118,6 +132,9 @@ export async function POST(request: Request) {
     console.log("🔍 Decoded token:", {
       userId: decodedToken.userId,
       email: decodedToken.email,
+      plan: decodedToken.plan,
+      hasProAccess: decodedToken.hasProAccess,
+      totalPoints: decodedToken.totalPoints,
       timestamp: decodedToken.timestamp,
     });
 
@@ -143,6 +160,9 @@ export async function POST(request: Request) {
           email: decodedToken.email,
           name: decodedToken.name,
           profileImage: decodedToken.profileImage,
+          plan: decodedToken.plan,
+          hasProAccess: decodedToken.hasProAccess,
+          totalPoints: decodedToken.totalPoints,
         },
       }),
       request

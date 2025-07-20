@@ -9,6 +9,8 @@ interface User {
   fullName?: string;
   firstName?: string;
   lastName?: string;
+  plan?: string;
+  hasProAccess?: boolean;
   subscription?: {
     plan: {
       name: string;

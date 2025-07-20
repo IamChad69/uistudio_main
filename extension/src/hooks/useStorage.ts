@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-type StorageType = 'local' | 'sync';
+type StorageType = "local" | "sync";
 
 /**
  * Custom hook for managing browser extension storage
@@ -12,20 +12,22 @@ type StorageType = 'local' | 'sync';
 export function useStorage<T>(
   key: string,
   initialValue: T,
-  storageType: StorageType = 'local'
+  storageType: StorageType = "local"
 ): [T, (value: T | ((val: T) => T)) => void] {
   // State to store our value
   const [storedValue, setStoredValue] = useState<T>(initialValue);
 
   // Check if we're in a browser context and if the chrome API is available
-  const isBrowser = typeof window !== 'undefined';
-  const hasStorageApi = isBrowser && typeof chrome !== 'undefined' && chrome.storage;
+  const isBrowser = typeof window !== "undefined";
+  const hasStorageApi =
+    isBrowser && typeof chrome !== "undefined" && chrome.storage;
 
   useEffect(() => {
     if (!hasStorageApi) return;
 
     // Get from storage by key
-    const storage = storageType === 'local' ? chrome.storage.local : chrome.storage.sync;
+    const storage =
+      storageType === "local" ? chrome.storage.local : chrome.storage.sync;
 
     // Function to get stored value
     const loadValue = async () => {
@@ -66,14 +68,16 @@ export function useStorage<T>(
   const setValue = (value: T | ((val: T) => T)) => {
     try {
       // Allow value to be a function to match useState API
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
 
       // Save state
       setStoredValue(valueToStore);
 
       // Save to storage if browser APIs are available
       if (hasStorageApi) {
-        const storage = storageType === 'local' ? chrome.storage.local : chrome.storage.sync;
+        const storage =
+          storageType === "local" ? chrome.storage.local : chrome.storage.sync;
         storage.set({ [key]: valueToStore });
       }
     } catch (error) {
