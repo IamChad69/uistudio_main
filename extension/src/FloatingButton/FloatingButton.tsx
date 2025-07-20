@@ -19,6 +19,7 @@ import LogoIcon from "../assets/icons/logo-icon.svg";
 import { AuthModal } from "../_components/AuthModal";
 import { useAuth } from "../hooks/useAuth";
 import SettingsModal from "../_components/Settings/SettingsModal";
+import AiChat from "../_components/AiChat";
 
 // Custom upgrade tooltip component that shows as a chat bubble with upgrade button
 interface UpgradeTooltipProps {
@@ -571,6 +572,7 @@ function FloatingButton({
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const [authStateChanged, setAuthStateChanged] = useState(false);
+  const [chatButtonPosition, setChatButtonPosition] = useState({ x: 0, y: 0 });
   const [buttonPosition, setButtonPosition] = useState<
     | {
         x: number;
@@ -625,6 +627,10 @@ function FloatingButton({
         .querySelector('[role="group"]')
         ?.getBoundingClientRect();
 
+      setChatButtonPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
       console.log("Button position:", rect);
     }
   };
@@ -865,7 +871,7 @@ function FloatingButton({
                 style={styles.mainButtonIcon}
                 aria-label="Ui Assistant"
                 tabIndex={0}
-                //onClick={handleToggleAiChat}
+                onClick={() => setIsAiChatOpen(!isAiChatOpen)}
                 onMouseOver={(e) => handleButtonHover(e.currentTarget, true)}
                 onMouseOut={(e) => handleButtonHover(e.currentTarget, false)}
                 onFocus={(e) => handleButtonHover(e.currentTarget, true)}
@@ -1023,9 +1029,14 @@ function FloatingButton({
         onClose={() => setIsSettingsModalOpen(false)}
         buttonPosition={buttonPosition}
       />
-      {/* {isAiChatOpen && (
-        Ai chat
-      )} */}
+      {isAiChatOpen && (
+        <AiChat
+          onClose={handleAiChatClose}
+          position={chatButtonPosition}
+          open={isAiChatOpen}
+          onCodeContextScraping={handleCodeContextScraping}
+        />
+      )}
     </div>
   );
 }
