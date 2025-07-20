@@ -125,7 +125,7 @@ const ProfileSettings: React.FC = () => {
                   </div>
                 </div>
                 <div style={styles.creditsUsed}>
-                  {usage.usedPoints} of your daily credits used
+                  {usage.usedPoints} of your monthly credits used
                 </div>
               </div>
             </>
