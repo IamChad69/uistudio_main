@@ -4,14 +4,12 @@ import browser from "webextension-polyfill";
 import App, { AppProps } from "./App";
 import { logger } from "../utils/logger";
 
-
-
 // --- Main Content Script Class ---
 
 class ContentScript {
-    // private scraper!: UIScraper;
-    // private fontInspector!: FontInspector;
-    // private assetExtractor!: AssetExtractor;
+  // private scraper!: UIScraper;
+  // private fontInspector!: FontInspector;
+  // private assetExtractor!: AssetExtractor;
   private isColorPickerActive: boolean = false;
   private reactRoot: ReactDOMClient.Root | null = null;
   private shadowHost: HTMLDivElement | null = null;
@@ -144,12 +142,8 @@ class ContentScript {
       `;
       shadowRoot.appendChild(resetStyles);
 
-      // Inject main CSS file
-      const mainStyleSheet = document.createElement("link");
-      mainStyleSheet.rel = "stylesheet";
-      mainStyleSheet.type = "text/css";
-      mainStyleSheet.href = browser.runtime.getURL("css/contentScript.css");
-      shadowRoot.appendChild(mainStyleSheet);
+      // Note: CSS is handled inline in the shadow DOM styles above
+      // No external CSS file needed for content script
 
       // Create the container for our React app
       const appContainer = document.createElement("div");
@@ -179,9 +173,9 @@ class ContentScript {
     // Prepare props for the App component
     const appProps: AppProps = {
       getIsScrapingActive: () => this.isScrapingActive,
-      onStartScraping: () => this.isScrapingActive = true, // Regular extraction mode (false)
-      onStartContextScraping: () => this.isScrapingActive = true, // Context mode for AI chat (true)
-      onStopScraping: () => this.isScrapingActive = false,
+      onStartScraping: () => (this.isScrapingActive = true), // Regular extraction mode (false)
+      onStartContextScraping: () => (this.isScrapingActive = true), // Context mode for AI chat (true)
+      onStopScraping: () => (this.isScrapingActive = false),
       onClose: () => {
         logger.info("Closing extension UI via App close button");
         this.closeExtensionUI();
