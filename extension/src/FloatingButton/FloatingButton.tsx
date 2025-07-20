@@ -12,9 +12,12 @@ import {
   Type,
   User as UserIcon,
   Wand2,
+  Crown,
 } from "lucide-react";
 import { Tooltip } from "../_components/Tooltip";
 import LogoIcon from "../assets/icons/logo-icon.svg";
+import { AuthModal } from "../_components/AuthModal";
+import { useAuth } from "../hooks/useAuth";
 
 // Custom upgrade tooltip component that shows as a chat bubble with upgrade button
 interface UpgradeTooltipProps {
@@ -569,6 +572,8 @@ function FloatingButton({
   const starButtonRef = useRef<HTMLButtonElement>(null);
   const buttonContainerRef = useRef<HTMLDivElement>(null);
 
+  const { isAuthenticated, user, loading } = useAuth();
+
   // Function to apply hover effect to an icon button
   const handleButtonHover = (element: HTMLElement, isHovering: boolean) => {
     element.style.color = isHovering ? "rgba(255, 255, 255, 0.9)" : "white";
@@ -578,6 +583,11 @@ function FloatingButton({
   };
 
   const handleToggleSettings = () => setIsSettingsModalOpen((open) => !open);
+
+  // Handle auth button click
+  const handleAuthClick = () => {
+    setIsAuthModalOpen(true);
+  };
 
   // Function to update the chat position based on button position
   const updateChatPosition = () => {
@@ -931,8 +941,8 @@ function FloatingButton({
                   <div style={spacedItemStyle}>
                     <button
                       style={styles.iconButton}
-                      //aria-label={isAuthenticated ? "Premium User" : "Sign In"}
-                      //onClick={handleAuthClick}
+                      aria-label={isAuthenticated ? "Premium User" : "Sign In"}
+                      onClick={handleAuthClick}
                       onMouseOver={(e) =>
                         handleButtonHover(e.currentTarget, true)
                       }
@@ -942,11 +952,11 @@ function FloatingButton({
                       onFocus={(e) => handleButtonHover(e.currentTarget, true)}
                       onBlur={(e) => handleButtonHover(e.currentTarget, false)}
                     >
-                      {/* {isAuthenticated ? (
+                      {isAuthenticated ? (
                         <Crown size={18} />
                       ) : (
                         <UserIcon size={18} />
-                      )} */}
+                      )}
                     </button>
                   </div>
                 </Tooltip>
@@ -975,10 +985,10 @@ function FloatingButton({
           </div>
         </div>
       </motion.div>
-      {/* <AuthModal
-        open={isAuthModalOpen}
+      <AuthModal
+        isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-      /> */}
+      />
       {/* <SettingsModal
         open={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}

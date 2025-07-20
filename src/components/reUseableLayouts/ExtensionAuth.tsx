@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { getExtensionAuthToken } from "@/lib/auth-client";
 
 const EXTENSION_ID = process.env.NEXT_PUBLIC_EXTENSION_ID;
 
@@ -16,8 +15,31 @@ const isChromeExtensionAvailable = () => {
 
 // Safer function to check for chrome runtime errors without TypeScript errors
 const getChromeError = () => {
-  // @ts-expect-error - Chrome extension API typing issues
+  // @ts-ignore - Chrome extension API typing issues
   return window.chrome?.runtime?.lastError;
+};
+
+// Client-side function to get extension auth token
+const getExtensionAuthToken = async () => {
+  console.log("🔍 Getting extension auth token...");
+  try {
+    const response = await fetch("/api/auth/extension", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log("🔍 Extension auth token response:", {
+      status: data.status,
+      hasToken: !!data.token,
+    });
+    return data;
+  } catch (error) {
+    console.error("🔍 Error getting extension auth token:", error);
+    return { status: 500, error: "Failed to get extension auth token" };
+  }
 };
 
 const ExtensionAuth = () => {

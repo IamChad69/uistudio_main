@@ -1,16 +1,36 @@
+// src/background.ts
 import browser from "webextension-polyfill";
+import { handleWebAppAuth } from "../actions/auth"; // Assuming this path is correct
 
-// Track extension visibility state for each tab
-const extensionVisibilityState: Record<number, boolean> = {};
+import {
+  AUTH_TOKEN_MESSAGE_TYPE,
+  FONT_INSPECTION_ACTION,
+  TOGGLE_COLOR_PICKER_ACTION,
+  TOGGLE_SCRAPING_ACTION,
+  SHOW_EXTENSION_ACTION,
+  HIDE_EXTENSION_ACTION,
+  EXTENSION_UI_CLOSED_ACTION,
+  EXTENSION_UI_SHOWN_ACTION,
+} from "../constants/messages";
 
-// Define message types
+import {
+  INSPECT_FONT_MENU_ID,
+  COLOR_PICKER_MENU_ID,
+} from "../constants/menuItems";
+import {
+  TOGGLE_SCRAPING_COMMAND,
+  START_FONT_INSPECTION_COMMAND,
+  START_COLOR_PICKER_COMMAND,
+} from "../constants/commands";
+
+// Track extension UI visibility state for each tab
+// Value is `true` if visible, `false` if closed by content script, `undefined` if unknown.
+const extensionVisibilityState: Record<number, boolean | undefined> = {};
+
+// Define message types and type guards
 interface AuthMessage {
-  type: "AUTH_TOKEN";
+  type: typeof AUTH_TOKEN_MESSAGE_TYPE;
   token: string;
-}
-
-interface PingMessage {
-  type: "PING";
 }
 
 // Type guard for auth messages
@@ -19,36 +39,44 @@ const isAuthMessage = (message: unknown): message is AuthMessage => {
     typeof message === "object" &&
     message !== null &&
     "type" in message &&
-    message.type === "AUTH_TOKEN" &&
+    (message as { type: unknown }).type === AUTH_TOKEN_MESSAGE_TYPE &&
     "token" in message &&
-    typeof message.token === "string"
+    typeof (message as { token: unknown }).token === "string"
   );
 };
 
-// Type guard for ping messages
-const isPingMessage = (message: unknown): message is PingMessage => {
+// Define the expected internal message structure
+interface ExtensionMessage {
+  action: string;
+  data?: Record<string, unknown>;
+  command?: string; // For color picker toggle command
+}
+
+// Type guard for internal messages
+const isExtensionMessage = (message: unknown): message is ExtensionMessage => {
   return (
-    typeof message === "object" &&
     message !== null &&
-    "type" in message &&
-    message.type === "PING"
+    typeof message === "object" &&
+    "action" in (message as Record<string, unknown>) &&
+    typeof (message as { action: unknown }).action === "string"
   );
 };
 
-// Listen for installation
+// --- Event Listeners ---
+
+// Listen for extension installation
 browser.runtime.onInstalled.addListener((): void => {
-  console.log("🔍 uiScraper extension installed");
+  console.log("[uiScraper] Extension installed");
 
   // Create context menu items
   browser.contextMenus.create({
-    id: "uiscraper-inspect-font",
+    id: INSPECT_FONT_MENU_ID,
     title: "Inspect Font and Styles",
     contexts: ["page", "selection", "image", "link"],
   });
 
-  // Add color picker context menu item
   browser.contextMenus.create({
-    id: "uiscraper-color-picker",
+    id: COLOR_PICKER_MENU_ID,
     title: "Pick Color",
     contexts: ["page", "selection", "image", "link"],
   });
@@ -56,222 +84,145 @@ browser.runtime.onInstalled.addListener((): void => {
 
 // Listen for context menu clicks
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "uiscraper-inspect-font" && tab?.id) {
-    console.log("🔍 Font inspection requested via context menu");
-    // Send message to content script to start font inspection
-    await browser.tabs.sendMessage(tab.id, { action: "startFontInspection" });
-  } else if (info.menuItemId === "uiscraper-color-picker" && tab?.id) {
-    console.log("🔍 Color picker requested via context menu");
-    // Send message to content script to start color picker
-    await browser.tabs.sendMessage(tab.id, {
-      action: "toggleColorPicker",
-      command: "start",
-    });
+  if (!tab?.id) {
+    console.warn("[uiScraper] Context menu click without valid tab ID.");
+    return;
+  }
+
+  try {
+    if (info.menuItemId === INSPECT_FONT_MENU_ID) {
+      console.log("[uiScraper] Font inspection requested via context menu");
+      await browser.tabs.sendMessage(tab.id, {
+        action: FONT_INSPECTION_ACTION,
+      });
+    } else if (info.menuItemId === COLOR_PICKER_MENU_ID) {
+      console.log("[uiScraper] Color picker requested via context menu");
+      await browser.tabs.sendMessage(tab.id, {
+        action: TOGGLE_COLOR_PICKER_ACTION,
+        command: "start", // Explicitly start the picker
+      });
+    }
+  } catch (error) {
+    console.error("[uiScraper] Error sending message via context menu:", error);
   }
 });
 
-// Listen for browser action click - can be used to toggle UI if needed
+// Listen for browser action click (extension icon click)
 browser.action.onClicked.addListener(async (tab) => {
-  if (tab.id) {
-    const tabId = tab.id;
+  if (!tab.id) {
+    console.warn("[uiScraper] Browser action click without valid tab ID.");
+    return;
+  }
 
-    // Check if we have the visibility state for this tab
-    // If we don't have it stored or if the UI is hidden, show the extension
-    if (extensionVisibilityState[tabId] === false) {
-      console.log("🔍 Extension was closed, showing UI again");
-      // Send message to show the extension
-      await browser.tabs.sendMessage(tabId, { action: "showExtension" });
-      extensionVisibilityState[tabId] = true;
+  const tabId = tab.id;
+  const isVisible = extensionVisibilityState[tabId];
+
+  try {
+    if (isVisible === true) {
+      console.log("[uiScraper] UI is visible, sending hideExtension message");
+      // Send message to hide the extension UI
+      await browser.tabs.sendMessage(tabId, { action: HIDE_EXTENSION_ACTION });
+      extensionVisibilityState[tabId] = false; // Optimistically update state
     } else {
       console.log(
-        "🔍 Extension icon clicked, but UI is already visible or state unknown"
+        "[uiScraper] UI is hidden or state unknown, sending showExtension message"
       );
-      // If we don't know the state, we don't do anything
-      // This prevents toggling when the icon is clicked if extension is already visible
+      // Send message to show the extension UI
+      await browser.tabs.sendMessage(tabId, { action: SHOW_EXTENSION_ACTION });
+      extensionVisibilityState[tabId] = true; // Optimistically update state
     }
+  } catch (error) {
+    console.error("[uiScraper] Error toggling extension UI:", error);
+    // If an error occurs, the state might not have updated on the content script side
+    // It's safer to revert optimistic update or re-evaluate state. For now, log.
   }
 });
 
 // Listen for keyboard shortcuts
 browser.commands.onCommand.addListener(async (command) => {
-  console.log("🔍 Command received:", command);
+  console.log(`[uiScraper] Command received: ${command}`);
 
   // Get the active tab - common for all commands
   const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-  console.log("🔍 Active tabs:", tabs.length);
-
   const activeTab = tabs[0];
+
   if (!activeTab || !activeTab.id) {
-    console.error("🔍 No active tab found");
+    console.error("[uiScraper] No active tab found to send command to.");
     return;
   }
 
   try {
-    if (command === "toggle-scraping") {
-      console.log("🔍 Processing toggle-scraping command");
-      console.log("🔍 Sending toggleScraping message to tab:", activeTab.id);
-
-      // Send toggle message to the content script
-      const response = await browser.tabs.sendMessage(activeTab.id, {
-        action: "toggleScraping",
-      });
-      console.log("🔍 Toggle response:", response);
-    } else if (command === "start-font-inspection") {
-      console.log("🔍 Processing start-font-inspection command");
-      console.log(
-        "🔍 Sending startFontInspection message to tab:",
-        activeTab.id
-      );
-
-      // Send font inspection message to the content script
-      const response = await browser.tabs.sendMessage(activeTab.id, {
-        action: "startFontInspection",
-      });
-      console.log("🔍 Font inspection response:", response);
-    } else if (command === "start-color-picker") {
-      console.log("🔍 Processing start-color-picker command");
-      console.log("🔍 Sending toggleColorPicker message to tab:", activeTab.id);
-
-      // Send color picker message to the content script
-      const response = await browser.tabs.sendMessage(activeTab.id, {
-        action: "toggleColorPicker",
-        command: "toggle",
-      });
-      console.log("🔍 Color picker response:", response);
+    let response;
+    switch (command) {
+      case TOGGLE_SCRAPING_COMMAND:
+        console.log(
+          `[uiScraper] Processing ${TOGGLE_SCRAPING_COMMAND} command for tab: ${activeTab.id}`
+        );
+        response = await browser.tabs.sendMessage(activeTab.id, {
+          action: TOGGLE_SCRAPING_ACTION,
+        });
+        break;
+      case START_FONT_INSPECTION_COMMAND:
+        console.log(
+          `[uiScraper] Processing ${START_FONT_INSPECTION_COMMAND} command for tab: ${activeTab.id}`
+        );
+        response = await browser.tabs.sendMessage(activeTab.id, {
+          action: FONT_INSPECTION_ACTION,
+        });
+        break;
+      case START_COLOR_PICKER_COMMAND:
+        console.log(
+          `[uiScraper] Processing ${START_COLOR_PICKER_COMMAND} command for tab: ${activeTab.id}`
+        );
+        response = await browser.tabs.sendMessage(activeTab.id, {
+          action: TOGGLE_COLOR_PICKER_ACTION,
+          command: "toggle", // Send 'toggle' command for keyboard shortcut
+        });
+        break;
+      default:
+        console.warn(`[uiScraper] Unrecognized command: ${command}`);
+        return;
     }
+    console.log(`[uiScraper] Response for ${command}:`, response);
   } catch (error) {
-    console.error("🔍 Error sending message:", error);
+    console.error(
+      `[uiScraper] Error sending command ${command} message to tab ${activeTab.id}:`,
+      error
+    );
   }
 });
 
-// Define the expected message structure
-interface ExtensionMessage {
-  action: string;
-  data?: Record<string, unknown>;
-  code?: string; // For openInEditor and saveCode actions
-  metadata?: {
-    fileName: string;
-    description: string;
-    timestamp: string;
-  }; // For saveCode action
-}
-
-// Listen for messages from content script
+// Listen for messages from content scripts
 browser.runtime.onMessage.addListener(
   (message: unknown, sender: browser.Runtime.MessageSender) => {
-    // Type guard to check if message matches our expected structure
-    const isExtensionMessage = (msg: unknown): msg is ExtensionMessage =>
-      msg !== null &&
-      typeof msg === "object" &&
-      "action" in (msg as Record<string, unknown>);
-
     // Safely cast message if it passes our type guard
     if (isExtensionMessage(message)) {
+      const tabId = sender.tab?.id;
+      if (!tabId) {
+        console.warn(
+          "[uiScraper] Message from content script without valid tab ID."
+        );
+        return false; // Not expecting async response for malformed message
+      }
+
       // Track extension closed state
-      if (message.action === "extensionUIClosed" && sender.tab?.id) {
-        console.log("🔍 Extension UI closed in tab:", sender.tab.id);
-        extensionVisibilityState[sender.tab.id] = false;
+      if (message.action === EXTENSION_UI_CLOSED_ACTION) {
+        console.log(`[uiScraper] Extension UI closed in tab: ${tabId}`);
+        extensionVisibilityState[tabId] = false;
       }
-
       // Track extension shown state
-      if (message.action === "extensionUIShown" && sender.tab?.id) {
-        console.log("🔍 Extension UI shown in tab:", sender.tab.id);
-        extensionVisibilityState[sender.tab.id] = true;
+      else if (message.action === EXTENSION_UI_SHOWN_ACTION) {
+        console.log(`[uiScraper] Extension UI shown in tab: ${tabId}`);
+        extensionVisibilityState[tabId] = true;
       }
-
-      // Handle open in editor action
-      if (message.action === "openInEditor" && message.code) {
-        console.log("🔍 Opening code in editor");
-
-        // Get the app URL from environment config
-        import("../config/environment")
-          .then((envModule) => {
-            const config = envModule.default;
-            const sandboxUrl = `${config.APP_URL}/sandbox`;
-
-            // Make sure code is defined and encode it for URL transmission
-            const codeToSend = message.code || "";
-            const encodedCode = encodeURIComponent(codeToSend);
-
-            // Create a new tab with the sandbox URL and the code as a parameter
-            browser.tabs
-              .create({
-                url: `${sandboxUrl}?code=${encodedCode}`,
-              })
-              .then(() => {
-                console.log("🔍 Opened sandbox with code in new tab");
-              })
-              .catch((err) => {
-                console.error("Error opening sandbox tab:", err);
-              });
-          })
-          .catch((err) => {
-            console.error("Error importing environment config:", err);
-          });
-
-        return true;
-      }
-
-      // Handle save code action
-      if (message.action === "saveCode" && message.code) {
-        console.log("🔍 Saving code to storage");
-
-        // Extract metadata if available
-        const metadata = message.metadata || {
-          fileName: "snippet.js",
-          description: "Code snippet",
-          timestamp: new Date().toISOString(),
-        };
-
-        // Generate a unique ID for the saved code
-        const codeId = `code_${Date.now()}`;
-
-        // Define the type for saved code
-        interface SavedCodeItem {
-          id: string;
-          code: string;
-          fileName: string;
-          description: string;
-          timestamp: string;
-          [key: string]: any;
-        }
-
-        // Create the storage object
-        const codeData = {
-          id: codeId,
-          code: message.code,
-          ...metadata,
-        };
-
-        // Save to browser storage
-        browser.storage.local
-          .get("savedCode")
-          .then((result: { savedCode?: SavedCodeItem[] }) => {
-            const savedCode: SavedCodeItem[] = result.savedCode || [];
-            savedCode.push(codeData as SavedCodeItem);
-
-            return browser.storage.local.set({ savedCode });
-          })
-          .then(() => {
-            console.log("🔍 Code saved successfully");
-
-            // Notify the user that the code was saved
-            browser.notifications.create({
-              type: "basic",
-              iconUrl: browser.runtime.getURL("icons/icon-48.png"),
-              title: "Code Saved",
-              message: `${metadata.fileName} has been saved to your library`,
-            });
-          })
-          .catch((err) => {
-            console.error("Error saving code:", err);
-          });
-      }
-
-      return true; // Indicate we'll respond asynchronously
+      // Add more internal message handling here if needed
+      return true; // Indicate we might respond asynchronously, or just acknowledging receipt
     }
-
-    return true;
+    console.warn(
+      "[uiScraper] Received unhandled or malformed internal message:",
+      message
+    );
+    return false; // No async response expected for unhandled message
   }
 );
 
@@ -279,128 +230,74 @@ browser.runtime.onMessage.addListener(
 browser.tabs.onRemoved.addListener((tabId) => {
   if (extensionVisibilityState[tabId] !== undefined) {
     delete extensionVisibilityState[tabId];
-    console.log("🔍 Cleaned up state for closed tab:", tabId);
+    console.log(`[uiScraper] Cleaned up state for closed tab: ${tabId}`);
   }
 });
 
-// Define interface for auth API response
-interface AuthApiResponse {
-  status: number;
-  user?: {
-    id: string;
-    email: string;
-    name: string;
-  };
-  message?: string;
-}
-
-// Function to handle web app authentication
-const handleWebAppAuth = async (token: string): Promise<AuthApiResponse> => {
-  try {
-    // Import environment config
-    const envModule = await import("../config/environment");
-    const config = envModule.default;
-
-    // API endpoint for auth verification
-    const verifyEndpoint = `${config.API_URL}/api/auth/verify`;
-
-    // Make API request to verify token
-    const response = await fetch(verifyEndpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    // Parse response
-    const data = await response.json();
-
-    return {
-      status: response.status,
-      user: data.user,
-      message: data.message,
-    };
-  } catch (error) {
-    console.error("Error verifying auth token:", error);
-    return {
-      status: 500,
-      message: "Internal error verifying token",
-    };
-  }
-};
-
-// Listen for messages from the web app
+// Listen for messages from the web app (external)
 browser.runtime.onMessageExternal.addListener(
-  (message: unknown, sender, sendResponse) => {
-    console.log("🔍 Received external message:", message);
-    console.log("🔍 From sender:", sender);
-    console.log("🔍 Extension ID:", browser.runtime.id); // Log the actual extension ID
-
-    // Handle ping messages for connection testing
-    if (isPingMessage(message)) {
-      console.log("🔍 Received ping from external source:", sender.url);
-      sendResponse({ success: true, message: "Extension is available" });
-      return true;
-    }
+  (
+    message: unknown,
+    sender: browser.Runtime.MessageSender,
+    sendResponse: (response: any) => void
+  ): true => {
+    console.log("[uiScraper] Received external message:", message);
+    console.log("[uiScraper] From sender:", sender);
+    console.log("[uiScraper] Message type check:", typeof message);
+    console.log("[uiScraper] Is auth message:", isAuthMessage(message));
+    console.log(
+      "[uiScraper] Message keys:",
+      message && typeof message === "object"
+        ? Object.keys(message as object)
+        : "Not an object"
+    );
 
     if (isAuthMessage(message)) {
-      console.log("🔍 Processing auth token...");
-      console.log("🔍 Token length:", message.token.length);
-
-      // Store the token first, then try to verify it
-      chrome.storage.local.set({ authToken: message.token }, () => {
-        console.log("🔍 Auth token stored in local storage directly");
-
-        // Now attempt the API verification
-        handleWebAppAuth(message.token)
-          .then((result: AuthApiResponse) => {
-            console.log("🔍 Auth result:", result);
-            if (result.status === 200 && result.user) {
-              console.log("🔍 User authenticated:", {
-                id: result.user.id,
-                email: result.user.email,
-                name: result.user.name,
-              });
-              sendResponse({ success: true });
-            } else {
-              console.error("🔍 Auth failed with status:", result.status);
-              // Even if verification fails, we still stored the token
-              sendResponse({
-                success: true,
-                message: "Token stored but verification failed",
-              });
-            }
-          })
-          .catch((error: Error) => {
-            console.error("🔍 Error handling auth token:", error);
-            // Even if verification fails, we still stored the token
-            sendResponse({
-              success: true,
-              message: "Token stored but API error occurred",
+      console.log("[uiScraper] Processing auth token...");
+      console.log("[uiScraper] Token received:", message.token ? "Yes" : "No");
+      handleWebAppAuth(message.token)
+        .then((result) => {
+          console.log("[uiScraper] Auth result:", result);
+          if (result.status === 200 && result.user) {
+            console.log("[uiScraper] User authenticated:", {
+              id: result.user.id,
+              email: result.user.email,
+              name: result.user.name,
             });
-          });
-      });
-
+          }
+          sendResponse({ success: result.status === 200 });
+        })
+        .catch((error) => {
+          console.error("[uiScraper] Error handling auth token:", error);
+          sendResponse({ success: false, error: error.message }); // Send error message
+        });
       return true; // Keep the message channel open for async response
     }
 
-    sendResponse({ success: false, message: "Unknown message type" });
+    console.warn("[uiScraper] Received unhandled external message:", message);
+    sendResponse({ success: false, error: "Unhandled message type" });
     return true; // Always return true to indicate we handled the message
   }
 );
 
-// Make the extension available in service worker contexts
-if (typeof self !== "undefined") {
-  // Service worker activation
-  self.addEventListener("activate", () => {
-    console.log("Service worker activated");
+// Make the extension available in service worker contexts (for Manifest V3)
+if (
+  typeof self !== "undefined" &&
+  typeof (self as any).addEventListener === "function"
+) {
+  // Service worker activation: useful for one-time setup or migrations
+  (self as any).addEventListener("activate", () => {
+    console.log("[uiScraper] Service worker activated");
+    // Example: Clean up old caches, migrate data
   });
 
-  // Message handling
-  self.addEventListener("message", (event) => {
-    console.log("Message received in service worker:", event.data);
+  // Message handling for direct messages to the service worker (less common for most extensions)
+  (self as any).addEventListener("message", (event: MessageEvent) => {
+    console.log("[uiScraper] Message received in service worker:", event.data);
+    // You could process messages here that don't need to be tied to a specific tab,
+    // like background tasks, data synchronization, etc.
   });
 }
 
+// Export an empty object to satisfy TypeScript if no other exports are needed
 export {};

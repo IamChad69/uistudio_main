@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/api(.*)",
   "/pricing(.*)",
+  "/api/auth/extension(.*)",
 ]);
 
 // CORS headers for API routes
