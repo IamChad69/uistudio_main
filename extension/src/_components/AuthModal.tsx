@@ -19,12 +19,14 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAuthSuccess?: (user: User) => void;
+  onAuthStateChange?: (isAuthenticated: boolean) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   onAuthSuccess,
+  onAuthStateChange,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       // Send message to background script to create tab
       const response = (await browser.runtime.sendMessage({
         action: "createAuthTab",
-        url: `${config.API_URL}/sign-in?redirect=extension`,
+        url: `${config.APP_URL}/sign-in?redirect=extension`,
       })) as { success: boolean; error?: string; tabId?: number };
 
       if (!response.success) {
@@ -55,6 +57,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onAuthSuccess(user);
             }
           }
+
+          // Notify parent components about auth state change
+          if (onAuthStateChange) {
+            onAuthStateChange(true);
+          }
+
           // Close the auth tab via background script
           await browser.runtime.sendMessage({
             action: "closeTab",
@@ -82,7 +90,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       // Send message to background script to create tab
       const response = (await browser.runtime.sendMessage({
         action: "createAuthTab",
-        url: `${config.API_URL}/sign-up?redirect=extension`,
+        url: `${config.APP_URL}/sign-up?redirect=extension`,
       })) as { success: boolean; error?: string; tabId?: number };
 
       if (!response.success) {
@@ -99,6 +107,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onAuthSuccess(user);
             }
           }
+
+          // Notify parent components about auth state change
+          if (onAuthStateChange) {
+            onAuthStateChange(true);
+          }
+
           // Close the auth tab via background script
           await browser.runtime.sendMessage({
             action: "closeTab",
@@ -122,6 +136,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
     try {
       await auth.logout();
+
+      // Notify parent components about auth state change
+      if (onAuthStateChange) {
+        onAuthStateChange(false);
+      }
+
+      // Send message to background script to refresh extension state
+      try {
+        await browser.runtime.sendMessage({
+          action: "refreshExtensionState",
+        });
+      } catch (error) {
+        console.error("Error refreshing extension state:", error);
+      }
+
       onClose();
     } catch (error) {
       console.error("Error signing out:", error);
@@ -339,7 +368,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   try {
                     await browser.runtime.sendMessage({
                       action: "createAuthTab",
-                      url: `${config.API_URL}`,
+                      url: `${config.APP_URL}`,
                     });
                   } catch (error) {
                     console.error("Error opening web app:", error);
