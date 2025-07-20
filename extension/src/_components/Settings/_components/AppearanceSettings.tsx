@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 
 // Define color presets and border styles
 export const colorPresets = [
-  { name: "Avocado Alien", value: "#6A78FC" },
-  { name: "Rainbow Candy", value: "#9C27B0" },
-  { name: "Honeydew Punch", value: "#009688" },
+  { name: "Royal Blue", value: "#6A78FC" },
+  { name: "Deep Purple", value: "#9C27B0" },
+  { name: "Teal Green", value: "#009688" },
   { name: "Electric Blue", value: "#2196F3" },
   { name: "Sunset Orange", value: "#FF5722" },
   { name: "Emerald Green", value: "#4CAF50" },
@@ -14,7 +14,6 @@ export const borderStyles = [
   { name: "Solid", value: "solid" },
   { name: "Dashed", value: "dashed" },
   { name: "Dotted", value: "dotted" },
-  { name: "Browser", value: "browser" },
 ] as const;
 
 // Define shortcuts
@@ -35,8 +34,6 @@ const getBorderStyle = (style: string) => {
       return "2px dashed";
     case "dotted":
       return "2px dotted";
-    case "browser":
-      return "2px solid";
     default:
       return "2px solid";
   }

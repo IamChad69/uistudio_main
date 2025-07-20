@@ -13,6 +13,14 @@ import {
 import ProfileSettings from "./_components/ProfileSettings";
 import AppearanceSettings from "./_components/AppearanceSettings";
 
+// Modal positioning constants
+const MODAL_WIDTH = 360; // Must match the CSS width in styles.modal
+const MODAL_MAX_HEIGHT = 600;
+const MODAL_MIN_MARGIN = 20;
+const MODAL_VERTICAL_OFFSET = 200;
+const MODAL_HEIGHT_BUFFER = 40;
+const BUTTON_OFFSET = 20;
+
 interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
@@ -39,28 +47,38 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const getModalPosition = () => {
     if (!buttonPosition) {
       return {
-        right: "20px",
-        bottom: "20px",
+        right: `${MODAL_MIN_MARGIN}px`,
+        bottom: `${MODAL_MIN_MARGIN}px`,
+      };
+    }
+
+    // Check if window is defined for SSR support
+    if (typeof window === "undefined") {
+      return {
+        right: `${MODAL_MIN_MARGIN}px`,
+        bottom: `${MODAL_MIN_MARGIN}px`,
       };
     }
 
     // Calculate available space
-    const modalWidth = 360;
-    const modalHeight = Math.min(600, window.innerHeight - 40);
-    const availableHeight = window.innerHeight - 40;
+    const modalHeight = Math.min(
+      MODAL_MAX_HEIGHT,
+      window.innerHeight - MODAL_HEIGHT_BUFFER
+    );
+    const availableHeight = window.innerHeight - MODAL_HEIGHT_BUFFER;
 
     // Position the modal to the left of the button
-    let right = window.innerWidth - buttonPosition.x + 20;
-    let bottom = window.innerHeight - buttonPosition.y - 200;
+    let right = window.innerWidth - buttonPosition.x + BUTTON_OFFSET;
+    let bottom = window.innerHeight - buttonPosition.y - MODAL_VERTICAL_OFFSET;
 
     // Ensure modal doesn't go off-screen horizontally
-    if (right < 20) right = 20;
-    if (right + modalWidth > window.innerWidth - 20) {
-      right = window.innerWidth - modalWidth - 20;
+    if (right < MODAL_MIN_MARGIN) right = MODAL_MIN_MARGIN;
+    if (right + MODAL_WIDTH > window.innerWidth - MODAL_MIN_MARGIN) {
+      right = window.innerWidth - MODAL_WIDTH - MODAL_MIN_MARGIN;
     }
 
     // Ensure modal doesn't go off-screen vertically
-    if (bottom < 20) bottom = 20;
+    if (bottom < MODAL_MIN_MARGIN) bottom = MODAL_MIN_MARGIN;
     if (bottom + modalHeight > availableHeight) {
       bottom = availableHeight - modalHeight;
     }
@@ -123,18 +141,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Accordion Content */}
                 {isActive && (
                   <div style={styles.accordionContent}>
-                    {idx === 0 && <ProfileSettings />}
-                    {idx === 2 && <AppearanceSettings />}
-                    {idx === 3 && (
-                      <div style={styles.placeholder}>
-                        Account settings placeholder
-                      </div>
-                    )}
-                    {idx === 1 && (
-                      <div style={styles.placeholder}>
-                        Notifications settings placeholder
-                      </div>
-                    )}
+                    {(() => {
+                      const TAB_COMPONENTS = {
+                        Profile: ProfileSettings,
+                        Appearance: AppearanceSettings,
+                        Notifications: () => (
+                          <div style={styles.placeholder}>
+                            Notifications settings placeholder
+                          </div>
+                        ),
+                        Account: () => (
+                          <div style={styles.placeholder}>
+                            Account settings placeholder
+                          </div>
+                        ),
+                      };
+
+                      const Component =
+                        TAB_COMPONENTS[
+                          tab.label as keyof typeof TAB_COMPONENTS
+                        ];
+                      return Component ? <Component /> : null;
+                    })()}
                   </div>
                 )}
               </div>
@@ -171,8 +199,8 @@ const styles = {
   modal: {
     background: "#000000",
     borderRadius: "12px",
-    width: "360px",
-    maxHeight: "calc(100vh - 40px)",
+    width: `${MODAL_WIDTH}px`,
+    maxHeight: `calc(100vh - ${MODAL_HEIGHT_BUFFER}px)`,
     overflowY: "auto" as const,
     boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
     display: "flex",

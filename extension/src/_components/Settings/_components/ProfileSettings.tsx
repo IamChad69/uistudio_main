@@ -1,8 +1,12 @@
 import React from "react";
 import { useAuth } from "../../../hooks/useAuth";
+import { useUsage } from "../../../hooks/useUsage";
+import { formatResetTime } from "../../../utils/formatTime";
+import config from "../../../config/environment";
 
 const ProfileSettings: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
+  const { usage, loading, error } = useUsage();
 
   if (!isAuthenticated || !user) {
     return (
@@ -39,11 +43,39 @@ const ProfileSettings: React.FC = () => {
       <div style={styles.creditsSection}>
         <div style={styles.creditsHeader}>
           <span style={styles.creditsTitle}>Credits Used</span>
-          <button style={styles.manageBtn}>Manage</button>
+          <button
+            style={styles.manageBtn}
+            onClick={() => {
+              // Open pricing page in new tab
+              window.open(`${config.APP_URL}/pricing`, "_blank");
+            }}
+          >
+            Manage
+          </button>
         </div>
         <div style={styles.creditsInfo}>
-          <div style={styles.planInfo}>Plan: 0/5</div>
-          <div style={styles.creditsUsed}>0 of your daily credits used</div>
+          {loading ? (
+            <div style={styles.loadingText}>Loading...</div>
+          ) : error ? (
+            <div style={styles.errorText}>Failed to load usage</div>
+          ) : usage ? (
+            <>
+              <div style={styles.planInfo}>
+                Plan: {usage.consumedPoints}/{usage.totalPoints}
+              </div>
+              <div style={styles.creditsUsed}>
+                {usage.consumedPoints} of your daily credits used
+              </div>
+              <div style={styles.resetTime}>
+                Resets in {formatResetTime(usage.msBeforeNext)}
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={styles.planInfo}>Plan: 0/5</div>
+              <div style={styles.creditsUsed}>0 of your daily credits used</div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -150,6 +182,20 @@ const styles = {
   },
   creditsUsed: {
     fontSize: "11px", // Larger text
+  },
+  loadingText: {
+    color: "#a1a1aa",
+    fontSize: "11px",
+    fontStyle: "italic",
+  },
+  errorText: {
+    color: "#ef4444",
+    fontSize: "11px",
+  },
+  resetTime: {
+    color: "#a1a1aa",
+    fontSize: "10px",
+    marginTop: "2px",
   },
 };
 

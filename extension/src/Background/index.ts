@@ -216,9 +216,24 @@ browser.runtime.onMessage.addListener(
               return { success: false, error: "No URL provided" };
             }
 
-            const newTab = await browser.tabs.create({ url });
-            console.log("[uiScraper] Auth tab created:", newTab.id);
-            return { success: true, tabId: newTab.id };
+            // Validate URL for security
+            try {
+              const urlObj = new URL(url);
+              if (!["http:", "https:"].includes(urlObj.protocol)) {
+                console.error(
+                  "[uiScraper] Invalid URL protocol:",
+                  urlObj.protocol
+                );
+                return { success: false, error: "Invalid URL protocol" };
+              }
+            } catch (urlError) {
+              console.error("[uiScraper] Invalid URL:", urlError);
+              return { success: false, error: "Invalid URL" };
+            }
+            // Open the authentication tab
+            const createdTab = await browser.tabs.create({ url });
+            console.log("[uiScraper] Auth tab created:", createdTab.id);
+            return { success: true, tabId: createdTab.id };
           } catch (error) {
             console.error("[uiScraper] Error creating auth tab:", error);
             return {
@@ -230,9 +245,14 @@ browser.runtime.onMessage.addListener(
         case "closeTab":
           try {
             const tabIdToClose = (message as any).tabId;
-            if (tabIdToClose) {
+            if (typeof tabIdToClose === "number" && tabIdToClose > 0) {
+              // Optional: Add additional security checks
+              // e.g., only allow closing tabs created by this extension
               await browser.tabs.remove(tabIdToClose);
               console.log("[uiScraper] Tab closed:", tabIdToClose);
+            } else {
+              console.error("[uiScraper] Invalid tab ID:", tabIdToClose);
+              return { success: false, error: "Invalid tab ID" };
             }
             return { success: true };
           } catch (error) {

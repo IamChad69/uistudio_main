@@ -45,6 +45,13 @@ export const removeAuthToken = async (): Promise<void> => {
   console.log("🔍 Auth token removed");
 };
 
+// Clear usage cache
+export const clearUsageCache = async (): Promise<void> => {
+  console.log("🔍 Clearing usage cache...");
+  await chrome.storage.local.remove("usage_data");
+  console.log("🔍 Usage cache cleared");
+};
+
 // Verify the token with the web app
 export const verifyToken = async (token: string): Promise<AuthResponse> => {
   console.log("🔍 Verifying token with web app...");

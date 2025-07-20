@@ -25,6 +25,14 @@ interface AuthState {
   subscriptionPlan?: string;
 }
 
+/**
+ * Interface describing the shape of the auth state change event detail
+ */
+interface AuthStateChangeEventDetail {
+  isAuthenticated: boolean;
+  token?: string;
+}
+
 export const useAuth = () => {
   const [state, setState] = useState<AuthState>({
     isAuthenticated: false,
@@ -38,8 +46,9 @@ export const useAuth = () => {
     checkAuth();
 
     // Listen for auth state changes from ContentScript
-    const handleAuthStateChange = (event: CustomEvent) => {
-      const { isAuthenticated: newAuthState, token } = event.detail;
+    const handleAuthStateChange = (event: Event) => {
+      const customEvent = event as CustomEvent<AuthStateChangeEventDetail>;
+      const { isAuthenticated: newAuthState, token } = customEvent.detail;
 
       if (newAuthState && token) {
         // User is authenticated
@@ -65,16 +74,10 @@ export const useAuth = () => {
     };
 
     // Add event listener
-    document.addEventListener(
-      "authStateChanged",
-      handleAuthStateChange as EventListener
-    );
+    document.addEventListener("authStateChanged", handleAuthStateChange);
 
     return () => {
-      document.removeEventListener(
-        "authStateChanged",
-        handleAuthStateChange as EventListener
-      );
+      document.removeEventListener("authStateChanged", handleAuthStateChange);
     };
   }, []);
 
@@ -146,6 +149,7 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       await authActions.removeAuthToken();
+      await authActions.clearUsageCache(); // Clear usage cache on logout
       setState({
         isAuthenticated: false,
         user: null,

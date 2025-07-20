@@ -557,12 +557,11 @@ class ContentScript {
       });
 
       // Update the auth state in the UI
-      if (this.reactRoot) {
-        const rootElement = this.reactRoot as unknown as HTMLElement;
+      if (this.shadowHost) {
         const event = new CustomEvent("authStateChanged", {
           detail: { isAuthenticated: true, token },
         });
-        rootElement.dispatchEvent(event);
+        this.shadowHost.dispatchEvent(event);
       }
     } catch (error) {
       logger.error("Error updating auth state:", error);
@@ -574,17 +573,16 @@ class ContentScript {
     logger.info("Clearing authentication state");
     try {
       // Remove the token from local storage
-      browser.storage.local.remove("authToken").then(() => {
+      browser.storage.local.remove("auth_token").then(() => {
         logger.info("Auth token removed from local storage");
       });
 
       // Update the auth state in the UI
-      if (this.reactRoot) {
-        const rootElement = this.reactRoot as unknown as HTMLElement;
+      if (this.shadowHost) {
         const event = new CustomEvent("authStateChanged", {
           detail: { isAuthenticated: false, token: null },
         });
-        rootElement.dispatchEvent(event);
+        this.shadowHost.dispatchEvent(event);
       }
     } catch (error) {
       logger.error("Error clearing auth state:", error);
