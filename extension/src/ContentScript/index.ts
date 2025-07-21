@@ -552,7 +552,7 @@ class ContentScript {
   private updateAuthState(token: string): void {
     try {
       // Store the token in local storage
-      browser.storage.local.set({ auth_token: token }).then(() => {
+      browser.storage.local.set({ authToken: token }).then(() => {
         logger.info("Auth token stored in local storage");
       });
 

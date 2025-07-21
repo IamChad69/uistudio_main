@@ -86,6 +86,7 @@ const styles = {
     display: "flex",
     flexDirection: "column" as const,
     gap: "12px",
+    pointerEvents: "none" as const,
   },
   inputContainer: {
     border: "1px solid #23272f",
@@ -93,9 +94,10 @@ const styles = {
     backgroundColor: "#1a1a1a",
     transition: "all 0.2s",
     padding: "12px",
+    pointerEvents: "auto" as const,
   },
   inputContainerFocused: {
-    borderColor: "#4169e1",
+    border: "1px solid #4169e1",
     boxShadow: "0 0 0 2px rgba(65, 105, 225, 0.2)",
   },
   textarea: {

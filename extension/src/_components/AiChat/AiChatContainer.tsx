@@ -3,12 +3,22 @@ import { ExternalLink, MoreHorizontal, Plus, X } from "lucide-react";
 import AiChatMessageCard from "./AiChatMessageCard";
 import AiChatMessageForm from "./AiChatMessageForm";
 import AiChatMessageLoading from "./AiChatMessageLoading";
+import { generateCode } from "../../utils/api";
+
+interface Fragment {
+  id: string;
+  title: string;
+  sandboxUrl: string;
+  files: Record<string, string>;
+}
 
 interface Message {
   id: string;
   content: string;
   role: "user" | "assistant";
   timestamp: Date;
+  fragment?: Fragment | null;
+  type?: "RESULT" | "ERROR";
 }
 
 interface AiChatContainerProps {
@@ -55,22 +65,66 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
     setMessages((prev) => [...prev, userMessage]);
     setIsPending(true);
 
-    // TODO: Add AI chat functionality here
-    console.log("AI Chat message:", message);
+    try {
+      // Call the API to generate code
+      const result = await generateCode(message.trim());
 
-    // Simulate API call
-    setTimeout(() => {
+      if (result.status === 200 && result.data) {
+        // Success - add assistant message with fragment
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: "I've generated the code for you! Here's what I created:",
+          role: "assistant",
+          timestamp: new Date(),
+          type: "RESULT",
+          fragment: {
+            id: result.data.projectId,
+            title: "Generated Component",
+            sandboxUrl: `https://uiscraper.com/projects/${result.data.projectId}`,
+            files: {},
+          },
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else if (result.status === 429) {
+        // Rate limit exceeded
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content:
+            "You have run out of credits. Please upgrade your plan to continue using AI features.",
+          role: "assistant",
+          timestamp: new Date(),
+          type: "ERROR",
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        // Other error
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: `Error: ${result.error || "Failed to generate code"}`,
+          role: "assistant",
+          timestamp: new Date(),
+          type: "ERROR",
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+      }
+    } catch (error) {
+      console.error("Error in AI chat:", error);
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content:
-          "This is a sample response from the UI Assistant. The actual AI functionality will be implemented later.",
+        content: "Sorry, something went wrong. Please try again.",
         role: "assistant",
         timestamp: new Date(),
+        type: "ERROR",
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+    } finally {
       setIsPending(false);
-    }, 2000);
+    }
   };
 
   // Calculate position relative to the button
@@ -216,6 +270,8 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
               content={message.content}
               role={message.role}
               timestamp={message.timestamp}
+              fragment={message.fragment}
+              type={message.type}
             />
           ))}
           {isPending && <AiChatMessageLoading />}
