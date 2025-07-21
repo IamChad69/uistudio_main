@@ -38,6 +38,7 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isPending, setIsPending] = useState(false);
   const [isLeftSide, setIsLeftSide] = useState(false);
+  const [contextData, setContextData] = useState<string>("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Determine if chat should be on the left or right side
@@ -67,8 +68,14 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
     setIsPending(true);
 
     try {
+      // Prepare the full message with context if available
+      let fullMessage = message.trim();
+      if (contextData) {
+        fullMessage = `Context: ${contextData}\n\nUser Request: ${message.trim()}`;
+      }
+
       // Call the API to generate code
-      const result = await generateCode(message.trim());
+      const result = await generateCode(fullMessage);
 
       if (result.status === 200 && result.data) {
         // Success - add assistant message with fragment
@@ -126,6 +133,139 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
     } finally {
       setIsPending(false);
     }
+  };
+
+  // Handle context scraping
+  const handleContextScraping = async () => {
+    if (!onCodeContextScraping) return;
+
+    // Add a loading message to indicate context is being captured
+    const loadingMessage: Message = {
+      id: Date.now().toString(),
+      content: "Capturing page context...",
+      role: "assistant",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, loadingMessage]);
+
+    try {
+      // Call the context scraping function
+      onCodeContextScraping();
+
+      // Simulate a delay to show the loading state
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Capture the current page's HTML structure
+      const pageContext = capturePageContext();
+      setContextData(pageContext);
+
+      // Update the loading message with success
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === loadingMessage.id
+            ? {
+                ...msg,
+                content:
+                  "Page context captured successfully! You can now ask questions about the current page.",
+              }
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error("Error capturing context:", error);
+
+      // Update the loading message with error
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === loadingMessage.id
+            ? {
+                ...msg,
+                content: "Failed to capture page context. Please try again.",
+              }
+            : msg
+        )
+      );
+    }
+  };
+
+  // Function to capture the current page's context
+  const capturePageContext = (): string => {
+    try {
+      const body = document.body;
+      if (!body) return "";
+
+      // Get the main content area (focus on the most relevant parts)
+      const mainContent =
+        body.querySelector("main") ||
+        body.querySelector("#main") ||
+        body.querySelector(".main") ||
+        body;
+
+      // Create a simplified representation of the page structure
+      const context = {
+        title: document.title,
+        url: window.location.href,
+        structure: extractPageStructure(mainContent),
+        styles: extractKeyStyles(mainContent),
+      };
+
+      return JSON.stringify(context, null, 2);
+    } catch (error) {
+      console.error("Error capturing page context:", error);
+      return "";
+    }
+  };
+
+  // Extract the page structure
+  const extractPageStructure = (element: HTMLElement): any => {
+    const structure: any = {
+      tagName: element.tagName.toLowerCase(),
+      className: element.className,
+      id: element.id,
+      children: [],
+    };
+
+    // Limit to first 10 children to avoid too much data
+    const children = Array.from(element.children).slice(0, 10);
+
+    children.forEach((child) => {
+      if (child instanceof HTMLElement) {
+        structure.children.push({
+          tagName: child.tagName.toLowerCase(),
+          className: child.className,
+          id: child.id,
+          textContent: child.textContent?.slice(0, 100), // Limit text content
+        });
+      }
+    });
+
+    return structure;
+  };
+
+  // Extract key styles from the page
+  const extractKeyStyles = (element: HTMLElement): any => {
+    const styles: any = {};
+
+    try {
+      const computedStyle = window.getComputedStyle(element);
+      const keyProperties = [
+        "font-family",
+        "font-size",
+        "color",
+        "background-color",
+        "display",
+        "position",
+      ];
+
+      keyProperties.forEach((prop) => {
+        styles[prop] = computedStyle.getPropertyValue(prop);
+      });
+    } catch (error) {
+      console.error("Error extracting styles:", error);
+    }
+
+    return styles;
   };
 
   // Calculate position relative to the button
@@ -198,6 +338,18 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
             tabIndex={-1}
           >
             UI Assistant
+            {contextData && (
+              <span
+                style={{
+                  marginLeft: "8px",
+                  fontSize: "12px",
+                  color: "#4169e1",
+                  fontWeight: "normal",
+                }}
+              >
+                • Context ready
+              </span>
+            )}
           </div>
 
           {/* Plus icon button (context scraping) */}
@@ -207,18 +359,44 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
               border: "none",
               padding: 0,
               margin: 0,
-              color: "#bdbdbd",
+              color: contextData ? "#4169e1" : "#bdbdbd",
               display: "flex",
               alignItems: "center",
               cursor: "pointer",
               outline: "none",
             }}
-            aria-label="Add context"
+            aria-label={
+              contextData
+                ? "Context captured - click to recapture"
+                : "Add context"
+            }
             tabIndex={0}
-            disabled
+            onClick={handleContextScraping}
           >
             <Plus size={16} />
           </button>
+
+          {/* Clear context button (only show when context is available) */}
+          {contextData && (
+            <button
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                margin: 0,
+                color: "#bdbdbd",
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              aria-label="Clear context"
+              tabIndex={0}
+              onClick={() => setContextData("")}
+            >
+              <X size={14} />
+            </button>
+          )}
 
           {/* More (three dots) icon */}
           <button
@@ -280,7 +458,11 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
         </div>
       </div>
 
-      <AiChatMessageForm onSubmit={handleSubmit} isPending={isPending} />
+      <AiChatMessageForm
+        onSubmit={handleSubmit}
+        isPending={isPending}
+        hasContext={!!contextData}
+      />
     </div>
   );
 };

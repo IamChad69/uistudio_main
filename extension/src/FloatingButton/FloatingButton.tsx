@@ -650,7 +650,7 @@ function FloatingButton({
     }
   };
 
-    // Update handleToggleExtraction to track extractions
+  // Update handleToggleExtraction to track extractions
   const handleToggleExtraction = async (event: React.MouseEvent) => {
     if (isScrapingActive) {
       onStopScraping();
