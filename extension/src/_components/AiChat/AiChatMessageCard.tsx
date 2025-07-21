@@ -13,16 +13,27 @@ const UserMessage: React.FC<UserMessageProps> = ({ content, timestamp }) => {
   );
 };
 
+interface Fragment {
+  id: string;
+  title: string;
+  sandboxUrl: string;
+  files: Record<string, string>;
+}
+
 interface AssistantMessageProps {
   content: string;
   timestamp: Date;
   isLoading?: boolean;
+  fragment?: Fragment | null;
+  type?: "RESULT" | "ERROR";
 }
 
 const AssistantMessage: React.FC<AssistantMessageProps> = ({
   content,
   timestamp,
   isLoading = false,
+  fragment,
+  type,
 }) => {
   return (
     <div style={assistantMessageStyles.container}>
@@ -46,9 +57,53 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
             <div style={assistantMessageStyles.loadingDot}></div>
           </div>
         ) : (
-          <span style={assistantMessageStyles.text}>{content}</span>
+          <>
+            <span
+              style={{
+                ...assistantMessageStyles.text,
+                ...(type === "ERROR" && { color: "#ef4444" }),
+              }}
+            >
+              {content}
+            </span>
+
+            {fragment && type === "RESULT" && (
+              <FragmentCard fragment={fragment} />
+            )}
+          </>
         )}
       </div>
+    </div>
+  );
+};
+
+interface FragmentCardProps {
+  fragment: Fragment;
+}
+
+const FragmentCard: React.FC<FragmentCardProps> = ({ fragment }) => {
+  const handleClick = () => {
+    // Open the fragment in a new tab
+    window.open(fragment.sandboxUrl, "_blank");
+  };
+
+  return (
+    <div style={fragmentCardStyles.container}>
+      <button
+        style={fragmentCardStyles.button}
+        onClick={handleClick}
+        title="Open in sandbox"
+      >
+        <div style={fragmentCardStyles.content}>
+          <div style={fragmentCardStyles.icon}>
+            <span style={fragmentCardStyles.iconText}>⚛</span>
+          </div>
+          <div style={fragmentCardStyles.info}>
+            <span style={fragmentCardStyles.title}>{fragment.title}.tsx</span>
+          </div>
+        </div>
+        <div style={fragmentCardStyles.arrow}>→</div>
+      </button>
     </div>
   );
 };
@@ -58,6 +113,8 @@ interface AiChatMessageCardProps {
   role: "user" | "assistant";
   timestamp: Date;
   isLoading?: boolean;
+  fragment?: Fragment | null;
+  type?: "RESULT" | "ERROR";
 }
 
 const AiChatMessageCard: React.FC<AiChatMessageCardProps> = ({
@@ -65,6 +122,8 @@ const AiChatMessageCard: React.FC<AiChatMessageCardProps> = ({
   role,
   timestamp,
   isLoading = false,
+  fragment,
+  type,
 }) => {
   if (role === "assistant") {
     return (
@@ -72,6 +131,8 @@ const AiChatMessageCard: React.FC<AiChatMessageCardProps> = ({
         content={content}
         timestamp={timestamp}
         isLoading={isLoading}
+        fragment={fragment}
+        type={type}
       />
     );
   }
@@ -159,6 +220,59 @@ const assistantMessageStyles = {
     borderRadius: "50%",
     backgroundColor: "#bdbdbd",
     animation: "pulse 1.5s ease-in-out infinite",
+  },
+};
+
+const fragmentCardStyles = {
+  container: {
+    marginTop: "12px",
+  },
+  button: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    padding: "12px",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    borderRadius: "8px",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    color: "#fff",
+    textDecoration: "none",
+    outline: "none",
+  },
+  content: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    flex: 1,
+  },
+  icon: {
+    width: "20px",
+    height: "20px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  iconText: {
+    fontSize: "12px",
+  },
+  info: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "2px",
+  },
+  title: {
+    fontSize: "12px",
+    fontWeight: "500",
+    color: "#fff",
+  },
+  arrow: {
+    fontSize: "12px",
+    color: "#bdbdbd",
+    marginLeft: "8px",
   },
 };
 

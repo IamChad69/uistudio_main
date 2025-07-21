@@ -79,6 +79,7 @@ export async function verifyExtensionAuthToken(token: string) {
         profileImage: decodedData.profileImage,
         plan: decodedData.plan || "free",
         hasProAccess: decodedData.hasProAccess || false,
+        totalPoints: decodedData.totalPoints || 3,
       },
     };
   } catch (error) {
