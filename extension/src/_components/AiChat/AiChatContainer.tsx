@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MoreHorizontal, Plus, X } from "lucide-react";
+import { Code2Icon, MoreHorizontal, Plus, X } from "lucide-react";
 import AiChatMessageCard from "./AiChatMessageCard";
 import AiChatMessageForm from "./AiChatMessageForm";
 import AiChatMessageLoading from "./AiChatMessageLoading";
 import { generateCode } from "../../utils/api";
+import LogoIcon from "../../assets/icons/logo-icon.svg";
 import config from "../../config/environment";
 
 interface Fragment {
@@ -89,7 +90,10 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
       // Prepare the full message with context if available
       let fullMessage = message.trim();
       if (contextData) {
-        fullMessage = `Component Context:\n${formatComponentData(contextData)}\n\nUser Request: ${message.trim()}`;
+        fullMessage = `Component Context:\n${formatComponentData(contextData)}\n\nUser Request: Create a React component based on this: ${message.trim()}`;
+      } else {
+        // Ensure we're always requesting component generation, not webpage generation
+        fullMessage = `Create a React component: ${message.trim()}`;
       }
 
       // Call the API to generate code
@@ -99,13 +103,14 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
         // Success - add assistant message with fragment
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: "I've generated the code for you! Here's what I created:",
+          content:
+            "🎉 I've created a React component for you! Here's what I built:",
           role: "assistant",
           timestamp: new Date(),
           type: "RESULT",
           fragment: {
             id: result.data.projectId,
-            title: "Generated Component",
+            title: "Component",
             sandboxUrl: `${config.APP_URL}/projects/${result.data.projectId}`,
             files: {},
           },
@@ -162,7 +167,8 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
     // Add a loading message to indicate context is being captured
     const loadingMessage: Message = {
       id: Date.now().toString(),
-      content: "Click on a component to capture it as context...",
+      content:
+        "🎯 **Component Capture Mode Active**\n\nClick on any component on the page to capture it as context. I'll then be able to help you create a React component based on it.\n\n*You have 10 seconds to select a component...*",
       role: "assistant",
       timestamp: new Date(),
     };
@@ -192,7 +198,7 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
             msg.id === loadingMessage.id
               ? {
                   ...msg,
-                  content: `Component captured! "${elementData.tagName}" with ${elementData.classNames ? elementData.classNames.split(" ").length : 0} classes. You can now ask me to recreate or modify this component.`,
+                  content: `Context Added!`,
                 }
               : msg
           )
@@ -223,7 +229,7 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
                 ? {
                     ...msg,
                     content:
-                      "No component selected. Click the + button again and select a component to capture.",
+                      "⏰ **Capture Timeout**\n\nNo component was selected within 10 seconds. Click the + button again to restart context capture mode.",
                   }
                 : msg
             )
@@ -234,7 +240,7 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
             handleElementSelected
           );
         }
-      }, 30000); // 30 second timeout
+      }, 10000); // 10 second timeout
     } catch (error) {
       console.error("Error capturing context:", error);
 
@@ -245,7 +251,7 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
             ? {
                 ...msg,
                 content:
-                  "Failed to capture component context. Please try again.",
+                  "❌ **Capture Failed**\n\nThere was an error capturing the component context. Please try clicking the + button again.",
               }
             : msg
         )
@@ -358,16 +364,38 @@ ${Object.entries(data.mediaQueries)
           >
             UI Assistant
             {contextData && (
-              <span
+              <div
                 style={{
                   marginLeft: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
                   fontSize: "12px",
                   color: "#4169e1",
                   fontWeight: "normal",
                 }}
               >
-                • Component ready
-              </span>
+                <Code2Icon size={16} />
+                <span>Context Added</span>
+                <button
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    margin: 0,
+                    color: "#bdbdbd",
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    outline: "none",
+                  }}
+                  aria-label="Clear context"
+                  tabIndex={0}
+                  onClick={() => setContextData(null)}
+                >
+                  <X size={14} />
+                </button>
+              </div>
             )}
           </div>
 
@@ -401,28 +429,6 @@ ${Object.entries(data.mediaQueries)
           >
             <Plus size={16} />
           </button>
-
-          {/* Clear context button (only show when context is available) */}
-          {contextData && (
-            <button
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                margin: 0,
-                color: "#bdbdbd",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-                outline: "none",
-              }}
-              aria-label="Clear context"
-              tabIndex={0}
-              onClick={() => setContextData(null)}
-            >
-              <X size={14} />
-            </button>
-          )}
 
           {/* More (three dots) icon */}
           <button

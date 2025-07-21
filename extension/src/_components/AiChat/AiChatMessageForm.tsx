@@ -48,7 +48,7 @@ const AiChatMessageForm: React.FC<AiChatMessageFormProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask me about this page or request UI components..."
+          placeholder="Dont reinvent the wheel, ask me to remix or modify this component..."
           style={styles.textarea}
           rows={3}
           disabled={isPending || disabled}
@@ -56,7 +56,7 @@ const AiChatMessageForm: React.FC<AiChatMessageFormProps> = ({
         <div style={styles.footer}>
           <div style={styles.shortcutHint}>
             {hasContext && (
-              <span style={styles.contextIndicator}>🎯 Component captured</span>
+              <span style={styles.contextIndicator}>🎯 Context Added</span>
             )}
             <kbd style={styles.kbd}>
               <span>⌘</span>

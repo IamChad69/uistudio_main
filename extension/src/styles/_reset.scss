@@ -1,4 +1,4 @@
-@import '~advanced-css-reset/dist/reset.css';
+@import "~advanced-css-reset/dist/reset.css";
 
 // Add your custom reset rules here
 
@@ -7,4 +7,27 @@
   padding: 0;
   border: 0;
   outline: 0;
+}
+
+// Loading animations
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
