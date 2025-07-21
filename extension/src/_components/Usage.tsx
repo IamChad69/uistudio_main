@@ -59,7 +59,7 @@ export const Usage: React.FC<UsageProps> = ({ className = "" }) => {
       <div style={styles.header}>
         <span style={styles.planLabel}>Plan</span>
         <span style={styles.usageText}>
-          {usage.consumedPoints}/{usage.totalPoints}
+          {usage.usedPoints}/{usage.totalPoints}
         </span>
         <span style={styles.resetTime}>{resetTime}</span>
       </div>
@@ -69,7 +69,7 @@ export const Usage: React.FC<UsageProps> = ({ className = "" }) => {
           <div
             style={{
               ...styles.progressFill,
-              width: `${(usage.consumedPoints / usage.totalPoints) * 100}%`,
+              width: `${(usage.usedPoints / usage.totalPoints) * 100}%`,
             }}
           />
         </div>
@@ -77,7 +77,7 @@ export const Usage: React.FC<UsageProps> = ({ className = "" }) => {
 
       <div style={styles.footer}>
         <span style={styles.creditsText}>
-          {usage.consumedPoints} of your daily credits used
+          {usage.usedPoints} of your daily credits used
         </span>
         <div style={styles.infoIcon}>i</div>
       </div>

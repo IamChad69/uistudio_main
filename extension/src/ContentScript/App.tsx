@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import FloatingButton from "../FloatingButton/FloatingButton";
-
 import ColorPicker from "../_components/ColorPicker";
 import { logger } from "../utils/logger";
 
