@@ -1,15 +1,7 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import {
-  X,
-  Settings,
-  Bell,
-  Palette,
-  User,
-  LogOut,
-  ChevronRight,
-} from "lucide-react";
+import { X, Settings, Palette, User, LogOut, ChevronRight } from "lucide-react";
 import ProfileSettings from "./_components/ProfileSettings";
 import AppearanceSettings from "./_components/AppearanceSettings";
 import WorkflowSettings from "./_components/WorkflowSettings";
@@ -45,7 +37,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     }
 
     // Calculate available space
-    const modalWidth = 360;
+    const modalWidth = 380;
     const modalHeight = Math.min(600, window.innerHeight - 40);
     const availableHeight = window.innerHeight - 40;
 
@@ -81,7 +73,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <button style={styles.closeBtn} onClick={onClose} aria-label="Close">
-          <X size={18} />
+          <X size={16} />
         </button>
 
         {/* Header Section */}
@@ -116,7 +108,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     style={{
                       ...styles.navArrow,
                       transform: isActive ? "rotate(90deg)" : "rotate(0deg)",
-                      transition: "transform 0.2s ease",
+                      transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                     }}
                   />
                 </button>
@@ -152,121 +144,230 @@ const styles = {
     left: 0,
     width: "100vw",
     height: "100vh",
-    background: "rgba(0,0,0,0.3)",
     zIndex: 2147483646,
     display: "flex",
     alignItems: "flex-end",
     justifyContent: "flex-end",
     padding: "20px",
     pointerEvents: "auto" as const,
+    animation: "fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    // Prevent pointer events from passing through the overlay
+    WebkitTapHighlightColor: "transparent",
   },
   modal: {
-    background: "#000000",
-    borderRadius: "12px",
-    width: "360px",
+    background: "linear-gradient(145deg, #0a0a0a 0%, #111111 100%)",
+    borderRadius: "16px",
+    width: "380px",
     maxHeight: "calc(100vh - 40px)",
     overflowY: "auto" as const,
-    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+    boxShadow: `
+      0 20px 25px -5px rgba(0, 0, 0, 0.4),
+      0 10px 10px -5px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.05)
+    `,
     display: "flex",
     flexDirection: "column" as const,
     position: "relative" as const,
-    border: "1px solid rgba(255, 255, 255, 0.15)",
+    border: "1px solid rgba(255, 255, 255, 0.08)",
     scrollbarWidth: "thin" as const,
-    scrollbarColor: "#23272f transparent" as const,
+    scrollbarColor: "rgba(255, 255, 255, 0.2) transparent" as const,
+    animation: "slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   },
   closeBtn: {
     position: "absolute" as const,
-    top: 12,
-    right: 12,
-    background: "rgba(255,255,255,0.1)",
+    top: 16,
+    right: 16,
+    background: "rgba(255, 255, 255, 0.08)",
     border: "none",
-    color: "#fff",
+    color: "rgba(255, 255, 255, 0.7)",
     cursor: "pointer",
-    padding: "8px",
-    borderRadius: "6px",
+    padding: "10px",
+    borderRadius: "10px",
     zIndex: 2,
-    transition: "background 0.2s",
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   header: {
-    padding: "16px 16px 12px 16px",
-    borderBottom: "1px solid #23272f",
+    padding: "24px 24px 16px 24px",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
     display: "flex",
     alignItems: "center",
     gap: "12px",
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%)",
   },
   headerTitle: {
-    color: "#fff",
-    fontSize: "16px",
+    color: "#ffffff",
+    fontSize: "20px",
     fontWeight: 600,
     margin: 0,
-    marginBottom: "8px",
+    letterSpacing: "-0.01em",
+    background:
+      "linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%)",
+    backgroundClip: "text",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
   },
   settingsNav: {
-    padding: "4px 0",
+    padding: "8px 0",
+    flex: 1,
   },
   accordionItem: {
-    borderBottom: "1px solid #23272f",
+    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
   },
   accordionContent: {
-    padding: "16px",
+    padding: "20px 24px",
     backgroundColor: "rgba(255, 255, 255, 0.02)",
     borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-    maxHeight: "300px",
+    maxHeight: "320px",
     overflowY: "auto" as const,
     scrollbarWidth: "thin" as const,
-    scrollbarColor: "#23272f transparent" as const,
+    scrollbarColor: "rgba(255, 255, 255, 0.2) transparent" as const,
+    animation: "expandDown 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
   },
   navItem: {
     width: "100%",
     background: "none",
     border: "none",
-    color: "#bdbdbd",
-    padding: "12px 16px",
+    color: "rgba(255, 255, 255, 0.7)",
+    padding: "16px 24px",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    transition: "background 0.2s, color 0.2s",
-    fontSize: "14px",
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    fontSize: "15px",
+    fontWeight: 500,
+    position: "relative" as const,
   },
   activeNavItem: {
-    background: "rgba(65, 105, 225, 0.1)",
-    color: "#4169e1",
+    background:
+      "linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)",
+    color: "#a78bfa",
+    borderLeft: "3px solid #8b5cf6",
   },
   navItemLeft: {
     display: "flex",
     alignItems: "center",
-    gap: "12px",
+    gap: "14px",
   },
   navArrow: {
-    opacity: 0.5,
+    opacity: 0.6,
+    color: "rgba(255, 255, 255, 0.5)",
   },
   placeholder: {
-    color: "#bdbdbd",
-    fontSize: "12px",
+    color: "rgba(255, 255, 255, 0.5)",
+    fontSize: "13px",
     textAlign: "center" as const,
-    padding: "20px 12px",
+    padding: "24px 16px",
+    fontStyle: "italic",
   },
   footer: {
     display: "flex",
     alignItems: "center",
-    borderTop: "1px solid #23272f",
-    padding: "12px 16px",
+    borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+    padding: "16px 24px",
     gap: "8px",
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%)",
+    borderBottomLeftRadius: "16px",
+    borderBottomRightRadius: "16px",
   },
   actionItem: {
     width: "100%",
     background: "none",
     border: "none",
-    color: "#bdbdbd",
-    padding: "12px 16px",
+    color: "rgba(255, 255, 255, 0.7)",
+    padding: "14px 16px",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
-    gap: "12px",
-    fontSize: "14px",
-    transition: "background 0.2s, color 0.2s",
+    gap: "14px",
+    fontSize: "15px",
+    fontWeight: 500,
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    borderRadius: "10px",
   },
 };
+
+// Add CSS animations
+const styleSheet = document.createElement("style");
+styleSheet.textContent = `
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  @keyframes expandDown {
+    from { 
+      opacity: 0;
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    to { 
+      opacity: 1;
+      max-height: 320px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+  }
+  
+  /* Enhanced hover effects */
+  button:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px);
+  }
+  
+  /* Close button hover */
+  button[aria-label="Close"]:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+    transform: scale(1.05);
+  }
+  
+  /* Action item hover */
+  button:last-child:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #fca5a5 !important;
+  }
+  
+  /* Custom scrollbar */
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+if (!document.head.querySelector("style[data-settings-modal]")) {
+  styleSheet.setAttribute("data-settings-modal", "true");
+  document.head.appendChild(styleSheet);
+}
 
 export default SettingsModal;

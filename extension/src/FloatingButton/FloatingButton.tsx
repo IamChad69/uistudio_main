@@ -635,12 +635,22 @@ function FloatingButton({
     }
   };
 
-  // Update chat position when the button is dragged
+  // Update chat position when the button is dragged or when chat opens
   useEffect(() => {
     if (isAiChatOpen) {
       updateChatPosition();
     }
   }, [isDragging, isAiChatOpen]);
+
+  // Update position when chat opens
+  useEffect(() => {
+    if (isAiChatOpen) {
+      // Small delay to ensure refs are available
+      setTimeout(() => {
+        updateChatPosition();
+      }, 0);
+    }
+  }, [isAiChatOpen]);
 
   // Handle the end of dragging - update chat position
   const handleDragEnd = () => {
