@@ -19,6 +19,9 @@ const addCorsHeaders = (response: NextResponse, request: Request) => {
   return response;
 };
 
+/**
+ * Handles CORS preflight (OPTIONS) requests by returning a 204 No Content response with appropriate CORS headers.
+ */
 export async function OPTIONS(request: Request) {
   const origin = request.headers.get("origin") || "";
   return new NextResponse(null, {
@@ -39,6 +42,13 @@ const generateSchema = z.object({
   token: z.string().min(1, { message: "Token is required" }),
 });
 
+/**
+ * Handles POST requests to generate a new code project based on user input.
+ *
+ * Validates the request body, authenticates the user via token, checks and consumes user credits, creates a new project with the provided input, and triggers asynchronous code generation. Returns a JSON response with the project ID and status, or an error message if authentication, credit, or server errors occur. All responses include appropriate CORS headers.
+ *
+ * @returns A JSON response containing the project ID and confirmation message on success, or an error message with the appropriate HTTP status code on failure.
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();

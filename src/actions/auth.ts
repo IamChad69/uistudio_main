@@ -53,7 +53,14 @@ export const getExtensionAuthToken = async () => {
   }
 };
 
-// Add a function to verify extension auth token
+/**
+ * Verifies a base64-encoded extension authentication token and returns user information if valid.
+ *
+ * Decodes the token, checks its structure, and ensures it has not expired (within 24 hours). Returns user details including ID, email, name, profile image, plan, pro access status, and total points if the token is valid. Returns appropriate status codes and error messages for invalid, expired, or malformed tokens.
+ *
+ * @param token - The base64-encoded authentication token to verify
+ * @returns An object containing the status code and either user information or an error message
+ */
 export async function verifyExtensionAuthToken(token: string) {
   try {
     const decodedData = JSON.parse(Buffer.from(token, "base64").toString());

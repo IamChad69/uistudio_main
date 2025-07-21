@@ -19,7 +19,9 @@ interface GenerateCodeResponse {
 }
 
 /**
- * Get the stored auth token from browser storage
+ * Retrieves the authentication token from the browser's local storage.
+ *
+ * @returns The stored auth token if available, or `null` if not found or on error.
  */
 export async function getAuthToken(): Promise<string | null> {
   try {
@@ -34,7 +36,12 @@ export async function getAuthToken(): Promise<string | null> {
 }
 
 /**
- * Call the code generation API
+ * Sends a request to the code generation API using the provided input value.
+ *
+ * Attempts to retrieve the authentication token and, if successful, calls the backend API to generate code. Returns a structured response containing the status, generated code data on success, or an error message on failure.
+ *
+ * @param value - The input string to be used for code generation
+ * @returns An API response object with status, generated code data, or an error message
  */
 export async function generateCode(
   value: string
@@ -91,7 +98,12 @@ export async function generateCode(
 }
 
 /**
- * Verify the auth token with the server
+ * Verifies the provided authentication token with the backend server.
+ *
+ * Sends a POST request to the verification endpoint and returns the result, including status and any error message.
+ *
+ * @param token - The authentication token to verify
+ * @returns An API response object containing the status, and either the verification result or an error message
  */
 export async function verifyAuthToken(token: string): Promise<ApiResponse> {
   try {
