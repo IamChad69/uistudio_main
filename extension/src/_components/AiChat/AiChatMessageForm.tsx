@@ -5,12 +5,14 @@ interface AiChatMessageFormProps {
   onSubmit: (message: string) => void;
   isPending?: boolean;
   disabled?: boolean;
+  hasContext?: boolean;
 }
 
 const AiChatMessageForm: React.FC<AiChatMessageFormProps> = ({
   onSubmit,
   isPending = false,
   disabled = false,
+  hasContext = false,
 }) => {
   const [message, setMessage] = useState("");
   const [isFocused, setIsFocused] = useState(false);
@@ -53,6 +55,9 @@ const AiChatMessageForm: React.FC<AiChatMessageFormProps> = ({
         />
         <div style={styles.footer}>
           <div style={styles.shortcutHint}>
+            {hasContext && (
+              <span style={styles.contextIndicator}>📄 Context available</span>
+            )}
             <kbd style={styles.kbd}>
               <span>⌘</span>
               Enter
@@ -121,6 +126,11 @@ const styles = {
     color: "#bdbdbd",
     fontSize: "11px",
     fontFamily: "monospace",
+  },
+  contextIndicator: {
+    color: "#4169e1",
+    fontSize: "11px",
+    marginRight: "8px",
   },
   kbd: {
     display: "inline-flex",
