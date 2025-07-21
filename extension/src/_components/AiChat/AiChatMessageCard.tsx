@@ -1,11 +1,13 @@
 import React from "react";
+import ReactIcon from "../../assets/icons/react.svg";
+import LogoIcon from "../../assets/icons/logo-icon.svg";
 
 interface UserMessageProps {
   content: string;
   timestamp: Date;
 }
 
-const UserMessage: React.FC<UserMessageProps> = ({ content, timestamp }) => {
+const UserMessage: React.FC<UserMessageProps> = ({ content }) => {
   return (
     <div style={userMessageStyles.container}>
       <div style={userMessageStyles.message}>{content}</div>
@@ -39,7 +41,13 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
     <div style={assistantMessageStyles.container}>
       <div style={assistantMessageStyles.header}>
         <div style={assistantMessageStyles.avatar}>
-          <div style={assistantMessageStyles.avatarIcon}>UI</div>
+          <img
+            src={LogoIcon}
+            alt="UI Assistant"
+            width={16}
+            height={16}
+            style={{ transform: "rotate(45deg)" }}
+          />
         </div>
         <span style={assistantMessageStyles.name}>UI Assistant</span>
         <span style={assistantMessageStyles.timestamp}>
@@ -92,14 +100,19 @@ const FragmentCard: React.FC<FragmentCardProps> = ({ fragment }) => {
       <button
         style={fragmentCardStyles.button}
         onClick={handleClick}
-        title="Open in sandbox"
+        title="Open in Editor"
       >
         <div style={fragmentCardStyles.content}>
           <div style={fragmentCardStyles.icon}>
-            <span style={fragmentCardStyles.iconText}>⚛</span>
+            <img
+              src={ReactIcon}
+              alt="React"
+              style={{ width: 20, height: 20, display: "block" }}
+            />
           </div>
           <div style={fragmentCardStyles.info}>
             <span style={fragmentCardStyles.title}>{fragment.title}.tsx</span>
+            <span style={fragmentCardStyles.subtitle}>Generated Component</span>
           </div>
         </div>
         <div style={fragmentCardStyles.arrow}>→</div>
@@ -176,10 +189,8 @@ const assistantMessageStyles = {
     paddingLeft: "8px",
   },
   avatar: {
-    width: "24px",
-    height: "24px",
-    borderRadius: "50%",
-    backgroundColor: "#4169e1",
+    width: "16px",
+    height: "16px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -268,6 +279,10 @@ const fragmentCardStyles = {
     fontSize: "12px",
     fontWeight: "500",
     color: "#fff",
+  },
+  subtitle: {
+    fontSize: "10px",
+    color: "#bdbdbd",
   },
   arrow: {
     fontSize: "12px",

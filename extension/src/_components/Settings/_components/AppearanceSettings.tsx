@@ -308,6 +308,8 @@ const ColorOption: React.FC<ColorOptionProps> = ({
         // Fixed: Apply hover border properties directly
         ...(isHovered && !selected
           ? {
+              borderWidth: "1px",
+              borderStyle: "solid",
               borderColor: "#666",
               backgroundColor: "rgba(255, 255, 255, 0.05)",
             }
@@ -393,7 +395,9 @@ const shortcutItemStyles = {
     padding: "8px",
     borderRadius: "6px",
     backgroundColor: "#1a1a1a",
-    border: "1px solid #23272f",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#23272f",
   },
   keyCombo: {
     backgroundColor: "#2a2a2a",
