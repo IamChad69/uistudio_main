@@ -104,6 +104,13 @@ export class UIScraper {
   }
 
   /**
+   * Stop scraping from external call (e.g., from AI Chat)
+   */
+  public stopScrapingFromExternal(): void {
+    this.stopScraping();
+  }
+
+  /**
    * Activate element selection mode
    */
   public startScraping(): void {
@@ -200,6 +207,12 @@ export class UIScraper {
         this.highlightedElement as EnhancedHTMLElement
       );
       console.log("🔍 uiScraper: Selected element data", elementData);
+
+      // Emit custom event for AI Chat context
+      const customEvent = new CustomEvent("uiScraper:elementSelected", {
+        detail: elementData,
+      });
+      document.dispatchEvent(customEvent);
 
       // Copy element data to clipboard
       this.copyToClipboard(elementData);

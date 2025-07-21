@@ -56,7 +56,7 @@ const AiChatMessageForm: React.FC<AiChatMessageFormProps> = ({
         <div style={styles.footer}>
           <div style={styles.shortcutHint}>
             {hasContext && (
-              <span style={styles.contextIndicator}>📄 Context available</span>
+              <span style={styles.contextIndicator}>🎯 Component captured</span>
             )}
             <kbd style={styles.kbd}>
               <span>⌘</span>

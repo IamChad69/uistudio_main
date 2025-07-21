@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react";
 
 // Define color presets and border styles
 export const colorPresets = [
-  { name: "Avocado Alien", value: "#6A78FC" },
-  { name: "Rainbow Candy", value: "#9C27B0" },
-  { name: "Honeydew Punch", value: "#009688" },
-  { name: "Electric Blue", value: "#2196F3" },
-  { name: "Sunset Orange", value: "#FF5722" },
-  { name: "Emerald Green", value: "#4CAF50" },
+  { name: "Blue", value: "#4169E1" },
+  { name: "Purple", value: "#9C27B0" },
+  { name: "Teal", value: "#009688" },
+  { name: "Light Blue", value: "#2196F3" },
+  { name: "Orange", value: "#FF5722" },
 ] as const;
 
 export const borderStyles = [
   { name: "Solid", value: "solid" },
   { name: "Dashed", value: "dashed" },
   { name: "Dotted", value: "dotted" },
-  { name: "Browser", value: "browser" },
+  { name: "Double", value: "double" },
 ] as const;
 
 // Define shortcuts
@@ -26,20 +25,35 @@ export const shortcuts = [
   },
 ] as const;
 
-// Helper function to get border style CSS
-const getBorderStyle = (style: string) => {
+// Helper function to get border style CSS properties
+// Returns an object with borderWidth and borderStyle
+const getBorderStyleProperties = (style: string) => {
+  let borderWidth = "2px";
+  let borderStyleValue = "solid";
+
   switch (style) {
     case "solid":
-      return "2px solid";
+      borderWidth = "2px";
+      borderStyleValue = "solid";
+      break;
     case "dashed":
-      return "2px dashed";
+      borderWidth = "2px";
+      borderStyleValue = "dashed";
+      break;
     case "dotted":
-      return "2px dotted";
-    case "browser":
-      return "2px solid";
+      borderWidth = "2px";
+      borderStyleValue = "dotted";
+      break;
+    case "double":
+      // Double borders typically need a thicker width to be visible
+      borderWidth = "3px";
+      borderStyleValue = "double";
+      break;
     default:
-      return "2px solid";
+      borderWidth = "2px";
+      borderStyleValue = "solid";
   }
+  return { borderWidth, borderStyle: borderStyleValue };
 };
 
 // Save settings to storage
@@ -90,6 +104,10 @@ export const AppearanceSettings: React.FC = () => {
     saveSettings({ highlightColor: selectedColor, borderStyle });
   };
 
+  // Get border properties for the preview line
+  const { borderWidth, borderStyle } =
+    getBorderStyleProperties(selectedBorderStyle);
+
   return (
     <div style={styles.container}>
       {/* Accent Color Section */}
@@ -139,7 +157,8 @@ export const AppearanceSettings: React.FC = () => {
               <div
                 style={{
                   ...styles.previewLine,
-                  border: getBorderStyle(selectedBorderStyle),
+                  borderWidth: borderWidth, // Fixed: Use individual properties
+                  borderStyle: borderStyle, // Fixed: Use individual properties
                   borderColor: selectedColor,
                 }}
               />
@@ -163,7 +182,6 @@ export const AppearanceSettings: React.FC = () => {
               key={shortcut.key}
               keyCombo={shortcut.key}
               action={shortcut.action}
-              description={shortcut.description}
             />
           ))}
         </div>
@@ -195,19 +213,18 @@ const styles = {
   optionsContainer: {
     backgroundColor: "#1a1a1a",
     borderRadius: "8px",
-    padding: "12px",
+    padding: "8px",
     border: "1px solid #23272f",
   },
   colorGrid: {
-    display: "flex",
-    flexDirection: "row" as const,
-    gap: "8px",
-    justifyContent: "space-between",
+    display: "grid",
+    gridTemplateColumns: "repeat(5, 1fr)",
+    gap: "4px",
   },
   borderGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "8px",
+    gap: "4px",
   },
   divider: {
     borderTop: "1px solid #23272f",
@@ -226,11 +243,19 @@ const styles = {
     color: "#fff",
     fontSize: "12px",
     marginBottom: "12px",
+    cursor: "pointer",
+    appearance: "none" as const,
+    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bdbdbd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 8px center",
+    backgroundSize: "16px",
+    paddingRight: "32px",
   },
   previewContainer: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
+    marginTop: "8px",
   },
   previewLabel: {
     color: "#bdbdbd",
@@ -240,11 +265,13 @@ const styles = {
   linePreview: {
     flex: 1,
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    minHeight: "20px",
   },
   previewLine: {
-    width: "60px",
-    height: "2px",
+    width: "80px",
+    height: "3px",
     borderRadius: "1px",
   },
 };
@@ -260,12 +287,31 @@ const ColorOption: React.FC<ColorOptionProps> = ({
   selected,
   onClick,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         ...colorOptionStyles.container,
-        ...(selected ? colorOptionStyles.selected : {}),
+        // Fixed: Apply selected border properties directly
+        ...(selected
+          ? {
+              borderWidth: colorOptionStyles.selected.borderWidth,
+              borderStyle: colorOptionStyles.selected.borderStyle,
+              borderColor: colorOptionStyles.selected.borderColor,
+              backgroundColor: colorOptionStyles.selected.backgroundColor,
+            }
+          : {}),
+        // Fixed: Apply hover border properties directly
+        ...(isHovered && !selected
+          ? {
+              borderColor: "#666",
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+            }
+          : {}),
       }}
     >
       <div
@@ -282,23 +328,28 @@ const colorOptionStyles = {
   container: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
-    padding: "8px",
+    justifyContent: "center",
+    padding: "2px",
     borderRadius: "6px",
-    border: "1px solid #23272f",
-    background: "transparent",
+    borderWidth: "1px", // Fixed: Use individual properties
+    borderStyle: "solid", // Fixed: Use individual properties
+    borderColor: "#23272f", // Fixed: Use individual properties
+    backgroundColor: "transparent",
     cursor: "pointer",
     transition: "all 0.2s",
-    minWidth: "60px",
+    minWidth: "40px",
+    height: "40px",
     flex: "1",
   },
   selected: {
-    borderColor: "#4169e1",
+    borderWidth: "1px", // Fixed: Use individual properties
+    borderStyle: "solid", // Fixed: Use individual properties
+    borderColor: "#4169e1", // Fixed: Use individual properties
     backgroundColor: "rgba(65, 105, 225, 0.1)",
   },
   colorSwatch: {
-    width: "16px",
-    height: "16px",
+    width: "24px",
+    height: "24px",
     borderRadius: "4px",
     flexShrink: 0,
   },
@@ -321,20 +372,14 @@ const colorOptionStyles = {
 interface ShortcutItemProps {
   keyCombo: string;
   action: string;
-  description: string;
 }
 
-const ShortcutItem: React.FC<ShortcutItemProps> = ({
-  keyCombo,
-  action,
-  description,
-}) => {
+const ShortcutItem: React.FC<ShortcutItemProps> = ({ keyCombo, action }) => {
   return (
     <div style={shortcutItemStyles.container}>
       <div style={shortcutItemStyles.keyCombo}>{keyCombo}</div>
       <div style={shortcutItemStyles.content}>
         <div style={shortcutItemStyles.action}>{action}</div>
-        <div style={shortcutItemStyles.description}>{description}</div>
       </div>
     </div>
   );

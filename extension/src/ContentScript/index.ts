@@ -295,6 +295,15 @@ class ContentScript {
       logger.info("Received custom event to stop color picker");
       this.stopColorPicker();
     });
+
+    // Listen for custom events to stop scraping (from AI Chat)
+    document.addEventListener("uiScraper:stopScraping", () => {
+      logger.info("Received custom event to stop scraping");
+      if (this.scraper.getIsActive()) {
+        this.scraper.stopScrapingFromExternal();
+        this.isScrapingActive = false;
+      }
+    });
   }
 
   private handleToggleSettings(): void {
@@ -572,12 +581,11 @@ class ContentScript {
       });
 
       // Update the auth state in the UI
-      if (this.reactRoot) {
-        const rootElement = this.reactRoot as unknown as HTMLElement;
+      if (this.shadowHost) {
         const event = new CustomEvent("authStateChanged", {
           detail: { isAuthenticated: true, token },
         });
-        rootElement.dispatchEvent(event);
+        this.shadowHost.dispatchEvent(event);
       }
     } catch (error) {
       logger.error("Error updating auth state:", error);
@@ -594,12 +602,11 @@ class ContentScript {
       });
 
       // Update the auth state in the UI
-      if (this.reactRoot) {
-        const rootElement = this.reactRoot as unknown as HTMLElement;
+      if (this.shadowHost) {
         const event = new CustomEvent("authStateChanged", {
           detail: { isAuthenticated: false, token: null },
         });
-        rootElement.dispatchEvent(event);
+        this.shadowHost.dispatchEvent(event);
       }
     } catch (error) {
       logger.error("Error clearing auth state:", error);
