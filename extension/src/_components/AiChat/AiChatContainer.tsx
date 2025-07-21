@@ -4,6 +4,7 @@ import AiChatMessageCard from "./AiChatMessageCard";
 import AiChatMessageForm from "./AiChatMessageForm";
 import AiChatMessageLoading from "./AiChatMessageLoading";
 import { generateCode } from "../../utils/api";
+import config from "../../config/environment";
 
 interface Fragment {
   id: string;
@@ -80,7 +81,7 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
           fragment: {
             id: result.data.projectId,
             title: "Generated Component",
-            sandboxUrl: `https://uiscraper.com/projects/${result.data.projectId}`,
+            sandboxUrl: `${config.APP_URL}/projects/${result.data.projectId}`,
             files: {},
           },
         };

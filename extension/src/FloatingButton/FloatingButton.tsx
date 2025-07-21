@@ -650,7 +650,7 @@ function FloatingButton({
     }
   };
 
-  // Handle extraction toggle
+    // Update handleToggleExtraction to track extractions
   const handleToggleExtraction = async (event: React.MouseEvent) => {
     if (isScrapingActive) {
       onStopScraping();
@@ -901,7 +901,7 @@ function FloatingButton({
                   borderRadius: "50%",
                   padding: "3px",
                 }}
-                //onClick={handleToggleExtraction}
+                onClick={handleToggleExtraction}
                 role="button"
                 aria-label={
                   isScrapingActive ? "Pause extraction" : "Start extraction"
@@ -1001,7 +1001,7 @@ function FloatingButton({
                   <button
                     style={styles.iconButton}
                     aria-label="Close"
-                    //onClick={handleClose}
+                    onClick={handleClose}
                     onMouseOver={(e) =>
                       handleButtonHover(e.currentTarget, true)
                     }

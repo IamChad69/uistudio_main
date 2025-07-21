@@ -16,7 +16,7 @@ import FragmentWeb from "../components/fragment-web";
 import { CodeIcon, EyeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Hint from "@/components/hint";
-import { RefreshCcw, ExternalLink } from "lucide-react";
+import { RefreshCcw, ExternalLink, Link, Check } from "lucide-react";
 import FileExplorer from "@/components/file-explorer";
 
 import { ErrorBoundary } from "react-error-boundary";
@@ -136,9 +136,10 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
               </TabsList>
 
               <div className="flex items-center gap-x-2 ml-auto">
+                {/* Refresh Button */}
                 <Hint text="Refresh the fragment" side="bottom" align="start">
                   <Button
-                    variant={"ghost"}
+                    variant="ghost"
                     size="sm"
                     onClick={onRefresh}
                     disabled={!activeFragment?.sandboxUrl}
@@ -146,24 +147,38 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
                     <RefreshCcw size={16} className="text-muted-foreground" />
                   </Button>
                 </Hint>
-                <Hint text="Copy URL" side="bottom">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={!activeFragment?.sandboxUrl || copied}
-                    onClick={handleCopy}
-                    className="justify-start text-start font-normal max-w-[140px] overflow-hidden text-ellipsis whitespace-nowrap bg-muted"
-                    style={{ minWidth: 0 }}
-                  >
-                    <span className="block overflow-hidden text-ellipsis whitespace-nowrap max-w-[120px]">
-                      {activeFragment?.sandboxUrl || "No URL available"}
-                    </span>
-                  </Button>
-                </Hint>
+
+                {/* URL Display with Copy */}
+                <div className="bg-gray-900 rounded-lg px-3 py-2 flex items-center gap-2 min-w-0 max-w-[300px]">
+                  <Link size={16} className="text-gray-400 flex-shrink-0" />
+                  <span className="text-white text-sm font-mono truncate flex-1 min-w-0">
+                    {activeFragment?.sandboxUrl || "No URL available"}
+                  </span>
+                  <Hint text="Copy URL" side="bottom">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={!activeFragment?.sandboxUrl || copied}
+                      onClick={handleCopy}
+                      className="bg-white text-black hover:bg-gray-100 px-3 py-1 text-xs font-medium flex-shrink-0"
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={12} className="mr-1" />
+                          Copied
+                        </>
+                      ) : (
+                        "Copy link"
+                      )}
+                    </Button>
+                  </Hint>
+                </div>
+
+                {/* Open in New Tab Button */}
                 <Hint text="Open in new tab" side="bottom" align="start">
                   <Button
                     disabled={!activeFragment?.sandboxUrl}
-                    variant={"ghost"}
+                    variant="ghost"
                     size="sm"
                     onClick={() => {
                       if (!activeFragment?.sandboxUrl) return;

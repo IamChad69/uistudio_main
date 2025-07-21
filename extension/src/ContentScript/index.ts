@@ -3,11 +3,13 @@ import * as ReactDOMClient from "react-dom/client";
 import browser from "webextension-polyfill";
 import App, { AppProps } from "./App";
 import { logger } from "../utils/logger";
+import { UIScraper } from "../lib/UIScraper";
+import config from "../config/environment";
 
 // --- Main Content Script Class ---
 
 class ContentScript {
-  // private scraper!: UIScraper;
+  private scraper!: UIScraper;
   // private fontInspector!: FontInspector;
   // private assetExtractor!: AssetExtractor;
   private isColorPickerActive: boolean = false;
@@ -39,11 +41,12 @@ class ContentScript {
     this.setupShadowDOM();
 
     // Initialize the scraper and set up its state change propagation
-    // this.scraper = new UIScraper();
-    // this.scraper.onStateChange((isActive) => {
-    //   logger.info(`Scraper state changed: ${isActive}. Notifying listeners.`);
-    //   this.stateChangeListeners.forEach((listener) => listener(isActive));
-    // });
+    this.scraper = new UIScraper();
+    this.scraper.onStateChange((isActive) => {
+      logger.info(`Scraper state changed: ${isActive}. Notifying listeners.`);
+      this.isScrapingActive = isActive; // Sync ContentScript state with scraper state
+      this.stateChangeListeners.forEach((listener) => listener(isActive));
+    });
 
     //Initialize the font inspector
     // this.fontInspector = new FontInspector();
@@ -173,9 +176,18 @@ class ContentScript {
     // Prepare props for the App component
     const appProps: AppProps = {
       getIsScrapingActive: () => this.isScrapingActive,
-      onStartScraping: () => (this.isScrapingActive = true), // Regular extraction mode (false)
-      onStartContextScraping: () => (this.isScrapingActive = true), // Context mode for AI chat (true)
-      onStopScraping: () => (this.isScrapingActive = false),
+      onStartScraping: () => {
+        this.isScrapingActive = true;
+        this.scraper.startScraping();
+      },
+      onStartContextScraping: () => {
+        this.isScrapingActive = true;
+        this.scraper.startScraping();
+      },
+      onStopScraping: () => {
+        this.isScrapingActive = false;
+        this.scraper.stopScraping();
+      },
       onClose: () => {
         logger.info("Closing extension UI via App close button");
         this.closeExtensionUI();
@@ -320,11 +332,13 @@ class ContentScript {
         event.keyCode === 67;
       if (isAltKey && isCKey) {
         logger.info("⌨️ ALT+C detected, toggling scraping.");
-        // if (this.scraper.getIsActive()) {
-        //   this.scraper.stopScraping();
-        // } else {
-        //   this.scraper.startScraping();
-        // }
+        if (this.scraper.getIsActive()) {
+          this.scraper.stopScraping();
+          this.isScrapingActive = false;
+        } else {
+          this.scraper.startScraping();
+          this.isScrapingActive = true;
+        }
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -456,6 +470,7 @@ class ContentScript {
     //Stop any active tools
     if (this.isScrapingActive) {
       this.isScrapingActive = false;
+      this.scraper.stopScraping();
     }
 
     if (this.isInspectionActive) {
@@ -635,7 +650,7 @@ class ContentScript {
     } else {
       // If not on the web app, open a new tab to the web app with the code
       const encodedCode = encodeURIComponent(code);
-      const webAppUrl = "https://uiscraper.com/sandbox?code=" + encodedCode;
+      const webAppUrl = config.APP_URL + "/sandbox?code=" + encodedCode;
 
       // Open in a new tab
       window.open(webAppUrl, "_blank");
