@@ -5,13 +5,14 @@ import App, { AppProps } from "./App";
 import { logger } from "../utils/logger";
 import { UIScraper } from "../lib/UIScraper";
 import config from "../config/environment";
+import { AssetExtractor } from "../lib/AssetExtractor";
 
 // --- Main Content Script Class ---
 
 class ContentScript {
   private scraper!: UIScraper;
   // FontInspector is now managed by the FontInspectorUI React component
-  // private assetExtractor!: AssetExtractor;
+  private assetExtractor!: AssetExtractor;
   private isColorPickerActive: boolean = false;
   private reactRoot: ReactDOMClient.Root | null = null;
   private shadowHost: HTMLDivElement | null = null;
@@ -52,7 +53,7 @@ class ContentScript {
     // No need to instantiate it here as the React component handles it
 
     // Initialize the asset extractor
-    // this.assetExtractor = new AssetExtractor();
+    this.assetExtractor = new AssetExtractor();
 
     // Render the React App if the shadow DOM was created successfully
     if (this.reactRoot) {
@@ -218,7 +219,7 @@ class ContentScript {
       },
       onStartAssetExtraction: () => {
         logger.info("Starting asset extraction");
-        //this.assetExtractor.startExtraction();
+        this.assetExtractor.startExtraction();
       },
       getIsAssetExtractionActive: () => {
         return this.isAssetExtractionActive;
@@ -389,7 +390,7 @@ class ContentScript {
         event.keyCode === 65;
       if (isAltKey && isAKey) {
         logger.info("⌨️ ALT+A detected, starting asset extraction.");
-        // this.assetExtractor.startExtraction();
+        this.assetExtractor.startExtraction();
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();

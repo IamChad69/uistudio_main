@@ -592,7 +592,7 @@ function FloatingButton({
                     <button
                       style={styles.iconButton}
                       aria-label="Assets"
-                      //onClick={handleAssetExtraction}
+                      onClick={onStartAssetExtraction}
                       onMouseOver={(e) =>
                         handleButtonHover(e.currentTarget, true)
                       }
