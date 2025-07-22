@@ -10,7 +10,7 @@ import config from "../config/environment";
 
 class ContentScript {
   private scraper!: UIScraper;
-  // private fontInspector!: FontInspector;
+  // FontInspector is now managed by the FontInspectorUI React component
   // private assetExtractor!: AssetExtractor;
   private isColorPickerActive: boolean = false;
   private reactRoot: ReactDOMClient.Root | null = null;
@@ -38,18 +38,18 @@ class ContentScript {
       "🔍 uiScraper content script initializing - unified injector v2"
     );
 
+    // Initialize the shadow DOM first
     this.setupShadowDOM();
 
-    // Initialize the scraper and set up its state change propagation
+    // Initialize the UI scraper
     this.scraper = new UIScraper();
-    this.scraper.onStateChange((isActive) => {
-      logger.info(`Scraper state changed: ${isActive}. Notifying listeners.`);
+    this.scraper.onStateChange((isActive: boolean) => {
       this.isScrapingActive = isActive; // Sync ContentScript state with scraper state
       this.stateChangeListeners.forEach((listener) => listener(isActive));
     });
 
-    //Initialize the font inspector
-    // this.fontInspector = new FontInspector();
+    // Font inspector will be managed by the FontInspectorUI React component
+    // No need to instantiate it here as the React component handles it
 
     // Initialize the asset extractor
     // this.assetExtractor = new AssetExtractor();
@@ -205,7 +205,13 @@ class ContentScript {
       },
       onStartInspection: () => {
         logger.info("Starting inspection mode");
-        //this.fontInspector.startInspection();
+        this.isInspectionActive = true;
+        // FontInspectorUI component will handle the actual inspection
+      },
+      onStopInspection: () => {
+        logger.info("Stopping inspection mode");
+        this.isInspectionActive = false;
+        // FontInspectorUI component will handle the actual inspection
       },
       getIsInspectionActive: () => {
         return this.isInspectionActive;
@@ -427,17 +433,27 @@ class ContentScript {
   }
 
   public cleanup(): void {
-    logger.info("🧹 Cleaning up uiScraper content script");
+    logger.info("🧹 Cleaning up ContentScript");
+
+    // Stop all active processes
+    if (this.scraper) {
+      this.scraper.stopScraping();
+    }
+
+    // FontInspector is managed by the React component, no cleanup needed here
+
+    // Remove shadow DOM
+    if (this.shadowHost && this.shadowHost.parentNode) {
+      this.shadowHost.parentNode.removeChild(this.shadowHost);
+    }
+
+    // Clean up React root
     if (this.reactRoot) {
       this.reactRoot.unmount();
       this.reactRoot = null;
     }
-    if (this.shadowHost?.parentNode) {
-      this.shadowHost.parentNode.removeChild(this.shadowHost);
-      this.shadowHost = null;
-    }
-    this.stateChangeListeners.clear();
-    // TODO: Remove keydown listeners
+
+    logger.info("✅ ContentScript cleanup completed");
   }
 
   // Handle color picker

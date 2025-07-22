@@ -21,7 +21,6 @@ import { useAuth } from "../hooks/useAuth";
 import SettingsModal from "../_components/Settings/SettingsModal";
 import AiChat from "../_components/AiChat";
 
-
 type TabQueryInfo = {
   active?: boolean;
   currentWindow?: boolean;
@@ -173,6 +172,8 @@ interface FloatingButtonProps {
   isScrapingActive: boolean;
   onToggleSettings?: () => void;
   onStartInspection?: () => void;
+  onStopInspection?: () => void;
+  isInspectionActive?: boolean;
   onStartAssetExtraction?: () => void;
   onStartColorPicker?: () => void;
   onClose?: () => void;
@@ -378,6 +379,8 @@ function FloatingButton({
   onStopScraping,
   isScrapingActive,
   onStartInspection,
+  onStopInspection,
+  isInspectionActive,
   onStartAssetExtraction,
   onStartColorPicker,
   onClose,
@@ -492,11 +495,22 @@ function FloatingButton({
   const handleInspect = (event: React.MouseEvent) => {
     console.log("FloatingButton: Inspect button clicked");
 
-    if (onStartInspection) {
-      console.log("FloatingButton: Starting UI inspection");
-      onStartInspection();
+    if (isInspectionActive) {
+      // Stop inspection if it's active
+      if (onStopInspection) {
+        console.log("FloatingButton: Stopping UI inspection");
+        onStopInspection();
+      } else {
+        console.warn("FloatingButton: Stop inspection function not provided");
+      }
     } else {
-      console.warn("FloatingButton: Inspection function not provided");
+      // Start inspection if it's not active
+      if (onStartInspection) {
+        console.log("FloatingButton: Starting UI inspection");
+        onStartInspection();
+      } else {
+        console.warn("FloatingButton: Start inspection function not provided");
+      }
     }
   };
 
