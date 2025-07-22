@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import FloatingButton from "../FloatingButton/FloatingButton";
 import ColorPicker from "../_components/ColorPicker";
+import { FontInspectorUI } from "../_components/fontInspectorUi";
 import { logger } from "../utils/logger";
 
 // Add browser API declaration for cross-browser compatibility
@@ -16,6 +17,7 @@ export interface AppProps {
     callback: (isActive: boolean) => void
   ) => () => void; // Returns unsubscribe function
   onStartInspection: () => void; // Add this for font inspection
+  onStopInspection?: () => void; // Add this for stopping font inspection
   getIsInspectionActive?: () => boolean; // Optional method to get inspection state
   onStartAssetExtraction?: () => void; // Add this for asset extraction
   getIsAssetExtractionActive?: () => boolean; // Optional method to get asset extraction state
@@ -32,6 +34,7 @@ const App: React.FC<AppProps> = ({
   onAppReady,
   onExternalScraperStateChange,
   onStartInspection,
+  onStopInspection,
   getIsInspectionActive,
   onStartAssetExtraction,
   getIsAssetExtractionActive,
@@ -146,6 +149,14 @@ const App: React.FC<AppProps> = ({
     onStartInspection();
     setIsInspectionActive(true);
   }, [isScrapingActive, onStopScraping, onStartInspection]);
+
+  const handleStopInspection = useCallback(() => {
+    logger.info("App: Stopping UI inspection");
+    if (onStopInspection) {
+      onStopInspection();
+    }
+    setIsInspectionActive(false);
+  }, [onStopInspection]);
 
   // Handle Asset Extraction
   const handleStartAssetExtraction = useCallback(() => {
@@ -287,6 +298,8 @@ const App: React.FC<AppProps> = ({
         onStopScraping={handleStopScraping}
         onToggleSettings={toggleSettingsPopup}
         onStartInspection={handleStartInspection}
+        onStopInspection={handleStopInspection}
+        isInspectionActive={isInspectionActive}
         onStartAssetExtraction={handleStartAssetExtraction}
         onStartColorPicker={handleStartColorPicker}
         onClose={handleClose}
@@ -298,6 +311,11 @@ const App: React.FC<AppProps> = ({
           isActive={isColorPickerActive}
           onClose={handleCloseColorPicker}
         />
+      )}
+
+      {/* Render the FontInspectorUI component when active */}
+      {isInspectionActive && (
+        <FontInspectorUI initialActive={isInspectionActive} />
       )}
     </div>
   );

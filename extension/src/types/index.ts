@@ -1,3 +1,46 @@
+// src/interfaces.ts
+
+export interface ColorValue {
+  rgb: string;
+  hex: string;
+}
+
+export interface FontMetrics {
+  ascent: number;
+  descent: number;
+  baseline: number;
+  xHeight: number;
+  capHeight: number;
+}
+
+export interface FontInfo {
+  elementType: string;
+  id: string;
+  className: string;
+  cssClasses: string[];
+  fontFamily: string;
+  renderedFont: string; // The first font in the family string, cleaned
+  fontSize: string;
+  fontWeight: string;
+  fontStyle: string;
+  lineHeight: string;
+  color: ColorValue;
+  backgroundColor: ColorValue;
+  textAlign: string;
+  letterSpacing: string;
+  textTransform: string;
+  textDecoration: string;
+  isWebSafe: boolean;
+  fontMetrics: FontMetrics;
+  textContent: string;
+  textLength: number;
+  wordCount: number;
+  lineCount: number;
+  isSystemFont: boolean;
+  hasCustomFont: boolean;
+  fontLoading: "loaded" | "loading" | "unknown"; // Added font loading status
+}
+
 export interface CapturedData {
   html: string;
   css: string;
@@ -34,7 +77,7 @@ export interface ColorPickerUI {
   preview?: HTMLDivElement;
 }
 
-export type Framework = 'react' | 'vue' | 'svelte' | 'html';
+export type Framework = "react" | "vue" | "svelte" | "html";
 
 export interface StorageData {
   // ... existing storage interface properties ...
@@ -46,7 +89,7 @@ export interface StorageData {
 export interface FormatterOptions {
   componentName?: string;
   typescript?: boolean;
-  styleFormat?: 'inline' | 'styled-components' | 'css-modules';
+  styleFormat?: "inline" | "styled-components" | "css-modules";
   isComponent?: boolean;
 }
 
