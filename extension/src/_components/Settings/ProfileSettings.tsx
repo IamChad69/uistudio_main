@@ -1,7 +1,8 @@
 import React from "react";
-import { useAuth } from "../../../hooks/useAuth";
-import { useUsage } from "../../../hooks/useUsage";
-import { openCreditManagement } from "../../../actions/usage";
+import { useAuth } from "../../hooks/useAuth";
+import { useUsage } from "../../hooks/useUsage";
+import { openCreditManagement } from "../../actions/usage";
+import { isProUser } from "../../utils/status";
 import { CrownIcon } from "lucide-react";
 
 // Define common styles for reusability and clarity
@@ -228,8 +229,8 @@ const ProfileSettings: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const { usage, loading: usageLoading, error: usageError } = useUsage();
 
-  // Get plan info from auth (more reliable than usage API)
-  const hasProAccess = user?.hasProAccess || false;
+  // Get plan info using the status utility function
+  const hasProAccess = user ? isProUser(user) : false;
 
   if (!isAuthenticated || !user) {
     return (

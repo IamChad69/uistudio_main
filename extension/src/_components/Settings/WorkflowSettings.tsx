@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { Crown } from "lucide-react";
-import useStorage from "../../../hooks/useStorage";
-import { useAuth } from "../../../hooks/useAuth";
-import Switch from "./Switch";
-import { Framework } from "../../../types";
-import useFramework from "../../../hooks/useFramework";
+import useStorage from "../../hooks/useStorage";
+import { useAuth } from "../../hooks/useAuth";
+import Switch from "../Ui/Switch";
+import { Framework } from "../../types";
+import useFramework from "../../hooks/useFramework";
 
 type FrameworkType = {
   id: Framework;

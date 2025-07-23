@@ -1,12 +1,12 @@
 // src/FontInspectorUI.tsx
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
-import { FontInfo } from "../types"; // Assuming interfaces.ts and fontInspector.ts for utilities
+import { FontInfo } from "../../types"; // Assuming interfaces.ts and fontInspector.ts for utilities
 import {
   FontInspector,
   copyToClipboard,
   generateCssProperties,
-} from "../lib/FontInspector"; // Import the core logic
+} from "../../actions/FontInspector"; // Import the core logic
 
 // Constants (can be moved to a shared constants file if needed)
 const FONT_INFO_TOOLTIP_ID = "uiscraper-font-tooltip";

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import browser from "webextension-polyfill";
 import {
   Pause,
   Settings,
@@ -14,156 +13,24 @@ import {
   Wand2,
   Crown,
 } from "lucide-react";
-import { Tooltip } from "../_components/Tooltip";
-import LogoIcon from "../assets/icons/logo-icon.svg";
-import { AuthModal } from "../_components/AuthModal";
-import { useAuth } from "../hooks/useAuth";
-import SettingsModal from "../_components/Settings/SettingsModal";
-import AiChat from "../_components/AiChat";
+import { Tooltip } from "../Ui/Tooltip";
+import LogoIcon from "../../assets/icons/logo-icon.svg";
+import { AuthModal } from "../Modals/AuthModal";
+import { useAuth } from "../../hooks/useAuth";
+import SettingsModal from "../Modals/SettingsModal";
+import AiChat from "../AiChat/AiChat";
+import { isProUser } from "../../utils/status";
+import {
+  getCurrentPageInfo,
+  checkBookmarkStatus,
+  toggleBookmark,
+  closeExtension,
+  handleInspectionToggle,
+  handleExtractionToggle,
+  applyButtonHoverEffect,
+  browserAPI as floatingButtonBrowserAPI,
+} from "../../actions/FloatingButtonAction";
 
-type TabQueryInfo = {
-  active?: boolean;
-  currentWindow?: boolean;
-  [key: string]: unknown;
-};
-
-type TabChangeCallback = (
-  tabId: number,
-  changeInfo?: browser.Tabs.OnUpdatedChangeInfoType,
-  tab?: browser.Tabs.Tab
-) => void;
-
-type TabActivatedCallback = (activeInfo: {
-  tabId: number;
-  windowId: number;
-}) => void;
-
-// Browser API utility for safe API access with better fallbacks
-const browserAPI = {
-  tabs: {
-    query: async (queryInfo: TabQueryInfo) => {
-      try {
-        // First try using the browser.tabs API
-        if (browser?.tabs?.query) {
-          return await browser.tabs.query(queryInfo);
-        }
-
-        // If running in content script, we can't access tabs API
-        // Fallback to using window.location for the current page
-        console.log(
-          "Browser tabs.query API not available, using window.location fallback"
-        );
-
-        // Create a mock tab object using the current page's window.location
-        if (window?.location?.href) {
-          return [
-            {
-              url: window.location.href,
-              title: document.title || "Untitled Page",
-              id: -1,
-              active: true,
-              index: 0,
-              highlighted: true,
-              pinned: false,
-              windowId: -1,
-            },
-          ];
-        }
-
-        console.warn("Unable to get URL from window.location");
-        return [];
-      } catch (error) {
-        console.error("Error accessing tabs.query API:", error);
-        // Return minimal mock data in case of error
-        if (window?.location?.href) {
-          return [
-            {
-              url: window.location.href,
-              title: document.title || "Untitled Page",
-            },
-          ];
-        }
-        return [];
-      }
-    },
-    onUpdated: {
-      addListener: (callback: TabChangeCallback) => {
-        try {
-          if (browser?.tabs?.onUpdated?.addListener) {
-            browser.tabs.onUpdated.addListener(callback);
-            return true;
-          }
-          // Quiet warning - this is expected in content scripts
-          console.debug(
-            "Browser tabs.onUpdated API not available - skipping listener"
-          );
-          return false;
-        } catch (error) {
-          console.error("Error adding tabs.onUpdated listener:", error);
-          return false;
-        }
-      },
-      removeListener: (callback: TabChangeCallback) => {
-        try {
-          if (browser?.tabs?.onUpdated?.removeListener) {
-            browser.tabs.onUpdated.removeListener(callback);
-            return true;
-          }
-          // No need to log warning during cleanup
-          return false;
-        } catch (error) {
-          console.error("Error removing tabs.onUpdated listener:", error);
-          return false;
-        }
-      },
-    },
-    onActivated: {
-      addListener: (callback: TabActivatedCallback) => {
-        try {
-          if (browser?.tabs?.onActivated?.addListener) {
-            browser.tabs.onActivated.addListener(callback);
-            return true;
-          }
-          // Quiet warning - this is expected in content scripts
-          console.debug(
-            "Browser tabs.onActivated API not available - skipping listener"
-          );
-          return false;
-        } catch (error) {
-          console.error("Error adding tabs.onActivated listener:", error);
-          return false;
-        }
-      },
-      removeListener: (callback: TabActivatedCallback) => {
-        try {
-          if (browser?.tabs?.onActivated?.removeListener) {
-            browser.tabs.onActivated.removeListener(callback);
-            return true;
-          }
-          // No need to log warning during cleanup
-          return false;
-        } catch (error) {
-          console.error("Error removing tabs.onActivated listener:", error);
-          return false;
-        }
-      },
-    },
-  },
-  runtime: {
-    sendMessage: async (message: unknown) => {
-      try {
-        if (browser?.runtime?.sendMessage) {
-          return await browser.runtime.sendMessage(message);
-        }
-        console.warn("Browser runtime.sendMessage API not available");
-        return null;
-      } catch (error) {
-        console.error("Error sending runtime message:", error);
-        return null;
-      }
-    },
-  },
-};
 
 interface FloatingButtonProps {
   onStartScraping: () => void;
@@ -177,20 +44,6 @@ interface FloatingButtonProps {
   onStartAssetExtraction?: () => void;
   onStartColorPicker?: () => void;
   onClose?: () => void;
-}
-
-// Extended User interface that includes subscription
-interface ExtendedUser {
-  id: string;
-  email: string;
-  name: string;
-  profileImage: string;
-  subscription?: {
-    plan: {
-      name: string;
-      extractionLimit: number;
-    };
-  };
 }
 
 // Define all styles as constants to keep the JSX clean
@@ -388,10 +241,12 @@ function FloatingButton({
   const [isDragging, setIsDragging] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPageBookmarked, setIsPageBookmarked] = useState(false);
+  const [isBookmarkLoading, setIsBookmarkLoading] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState("");
+  const [currentTitle, setCurrentTitle] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isAiChatOpen, setIsAiChatOpen] = useState(false);
-  const [authStateChanged, setAuthStateChanged] = useState(false);
   const [chatButtonPosition, setChatButtonPosition] = useState({ x: 0, y: 0 });
   const [buttonPosition, setButtonPosition] = useState<
     | {
@@ -404,23 +259,56 @@ function FloatingButton({
   const starButtonRef = useRef<HTMLButtonElement>(null);
   const buttonContainerRef = useRef<HTMLDivElement>(null);
 
-  const { isAuthenticated, user, loading, checkAuth } = useAuth();
+  // Use the useAuth hook for authentication state
+  const { isAuthenticated, user } = useAuth();
 
-  // Handle auth state changes
+  // Get pro status using the utility function
+  const isPro = user ? isProUser(user) : false;
+
+  // Get current page information and check bookmark status
   useEffect(() => {
-    if (authStateChanged) {
-      // Refresh auth state
-      checkAuth();
-      setAuthStateChanged(false);
-    }
-  }, [authStateChanged, checkAuth]);
+    const fetchPageInfo = async () => {
+      const pageInfo = await getCurrentPageInfo();
+      if (pageInfo) {
+        setCurrentUrl(pageInfo.url);
+        setCurrentTitle(pageInfo.title);
+
+        // Check if the page is already bookmarked
+        const isBookmarked = await checkBookmarkStatus(pageInfo.url, user);
+        setIsPageBookmarked(isBookmarked);
+      }
+    };
+
+    fetchPageInfo();
+
+    // Listen for tab updates to refresh bookmark status
+    const handleTabUpdate = async (
+      tabId: number,
+      changeInfo?: any,
+      tab?: any
+    ) => {
+      if (changeInfo?.url && tab?.active) {
+        setCurrentUrl(changeInfo.url);
+        setCurrentTitle(tab.title || "Untitled Page");
+
+        // Check bookmark status for the new URL
+        const isBookmarked = await checkBookmarkStatus(changeInfo.url, user);
+        setIsPageBookmarked(isBookmarked);
+      }
+    };
+
+    // Add tab update listener
+    floatingButtonBrowserAPI.tabs.onUpdated.addListener(handleTabUpdate);
+
+    // Cleanup listener on unmount
+    return () => {
+      floatingButtonBrowserAPI.tabs.onUpdated.removeListener(handleTabUpdate);
+    };
+  }, [user]); // Add user as dependency to re-check bookmark status when user changes
 
   // Function to apply hover effect to an icon button
   const handleButtonHover = (element: HTMLElement, isHovering: boolean) => {
-    element.style.color = isHovering ? "rgba(255, 255, 255, 0.9)" : "white";
-    element.style.backgroundColor = isHovering
-      ? "rgba(255, 255, 255, 0.12)"
-      : "transparent";
+    applyButtonHoverEffect(element, isHovering);
   };
 
   const handleToggleSettings = () => {
@@ -482,74 +370,59 @@ function FloatingButton({
 
   // Update handleToggleExtraction to track extractions
   const handleToggleExtraction = async (event: React.MouseEvent) => {
-    if (isScrapingActive) {
-      onStopScraping();
-      return;
-    }
-
-    // Start scraping (limit checks are now handled by the UI conditionals)
-    onStartScraping();
+    handleExtractionToggle(isScrapingActive, onStartScraping, onStopScraping);
   };
 
   // Handle inspect button click
   const handleInspect = (event: React.MouseEvent) => {
-    console.log("FloatingButton: Inspect button clicked");
-
-    if (isInspectionActive) {
-      // Stop inspection if it's active
-      if (onStopInspection) {
-        console.log("FloatingButton: Stopping UI inspection");
-        onStopInspection();
-      } else {
-        console.warn("FloatingButton: Stop inspection function not provided");
-      }
-    } else {
-      // Start inspection if it's not active
-      if (onStartInspection) {
-        console.log("FloatingButton: Starting UI inspection");
-        onStartInspection();
-      } else {
-        console.warn("FloatingButton: Start inspection function not provided");
-      }
-    }
+    handleInspectionToggle(
+      isInspectionActive || false,
+      onStartInspection,
+      onStopInspection
+    );
   };
 
   // Handle close button click
   const handleClose = () => {
-    console.log("FloatingButton: Close button clicked");
-
-    // Stop scraping if it's active when closing
-    if (isScrapingActive) {
-      onStopScraping();
-    }
-
-    try {
-      // Send message to background script to handle extension closing
-      // Use our wrapped browserAPI for better error handling
-      browserAPI.runtime.sendMessage({ action: "closeExtension" });
-
-      // Call the onClose prop if provided
-      if (onClose) {
-        onClose();
-      } else {
-        console.warn("FloatingButton: Close handler not provided");
-
-        // Fallback to hiding the component if onClose not provided
-        // This uses direct DOM manipulation as a last resort
-        const extensionRoot = document.getElementById("uiScraper-root");
-        if (extensionRoot) {
-          extensionRoot.style.display = "none";
-        }
-      }
-    } catch (error) {
-      console.error("Error closing extension:", error);
-      // showNotification("Failed to close extension", "error");
-    }
+    closeExtension(
+      Boolean(isScrapingActive),
+      onStopScraping,
+      onClose || (() => {})
+    );
   };
 
   // Handle AiChat close
   const handleAiChatClose = () => {
     setIsAiChatOpen(false);
+  };
+
+  // Handle bookmark toggle
+  const handleBookmarkToggle = async () => {
+    setIsBookmarkLoading(true);
+    try {
+      const result = await toggleBookmark(
+        currentUrl,
+        currentTitle,
+        isPageBookmarked,
+        isAuthenticated,
+        user
+      );
+
+      if (result.success) {
+        setIsPageBookmarked(result.isBookmarked);
+      } else if (result.error) {
+        // Show error message to user (you can implement a toast notification here)
+        console.warn("Bookmark error:", result.error);
+        // Optionally show a notification to upgrade to Pro
+        alert(
+          "Bookmark feature requires Pro subscription. Please upgrade to use this feature."
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+    } finally {
+      setIsBookmarkLoading(false);
+    }
   };
 
   // Handle code context scraping
@@ -660,25 +533,70 @@ function FloatingButton({
                 <div style={styles.divider}></div>
 
                 <Tooltip
-                  text={isPageBookmarked ? "Remove bookmark" : "Bookmark page"}
+                  text={
+                    !isAuthenticated || !isPro
+                      ? "Pro feature - Upgrade required"
+                      : isBookmarkLoading
+                        ? "Loading..."
+                        : isPageBookmarked
+                          ? "Remove bookmark"
+                          : "Bookmark page"
+                  }
                   position="left"
                   showHoverEffect={false}
                 >
                   <div style={spacedItemStyle}>
                     <button
-                      style={styles.iconButton}
+                      style={{
+                        ...styles.iconButton,
+                        opacity:
+                          isBookmarkLoading || !isAuthenticated || !isPro
+                            ? 0.6
+                            : 1,
+                        cursor:
+                          isBookmarkLoading || !isAuthenticated || !isPro
+                            ? "not-allowed"
+                            : "pointer",
+                      }}
                       aria-label={
-                        isPageBookmarked ? "Remove bookmark" : "Bookmark page"
+                        !isAuthenticated || !isPro
+                          ? "Pro feature - Upgrade required"
+                          : isBookmarkLoading
+                            ? "Loading..."
+                            : isPageBookmarked
+                              ? "Remove bookmark"
+                              : "Bookmark page"
                       }
-                      //onClick={handleBookmarkToggle}
+                      onClick={
+                        !isAuthenticated || !isPro
+                          ? undefined
+                          : handleBookmarkToggle
+                      }
+                      disabled={isBookmarkLoading || !isAuthenticated || !isPro}
                       onMouseOver={(e) =>
+                        !isBookmarkLoading &&
+                        isAuthenticated &&
+                        isPro &&
                         handleButtonHover(e.currentTarget, true)
                       }
                       onMouseOut={(e) =>
+                        !isBookmarkLoading &&
+                        isAuthenticated &&
+                        isPro &&
                         handleButtonHover(e.currentTarget, false)
                       }
-                      onFocus={(e) => handleButtonHover(e.currentTarget, true)}
-                      onBlur={(e) => handleButtonHover(e.currentTarget, false)}
+                      onFocus={(e) =>
+                        !isBookmarkLoading &&
+                        isAuthenticated &&
+                        isPro &&
+                        handleButtonHover(e.currentTarget, true)
+                      }
+                      onBlur={(e) =>
+                        !isBookmarkLoading &&
+                        isAuthenticated &&
+                        isPro &&
+                        handleButtonHover(e.currentTarget, false)
+                      }
                     >
                       {isPageBookmarked ? (
                         <BookMarked size={18} />
@@ -809,14 +727,26 @@ function FloatingButton({
 
                 <div style={styles.divider}></div>
                 <Tooltip
-                  text={"Sign In"}
+                  text={
+                    isAuthenticated
+                      ? isPro
+                        ? "Pro User"
+                        : "Premium User"
+                      : "Sign In"
+                  }
                   position="left"
                   showHoverEffect={false}
                 >
                   <div style={spacedItemStyle}>
                     <button
                       style={styles.iconButton}
-                      aria-label={isAuthenticated ? "Premium User" : "Sign In"}
+                      aria-label={
+                        isAuthenticated
+                          ? isPro
+                            ? "Pro User"
+                            : "Premium User"
+                          : "Sign In"
+                      }
                       onClick={handleAuthClick}
                       onMouseOver={(e) =>
                         handleButtonHover(e.currentTarget, true)
@@ -863,7 +793,6 @@ function FloatingButton({
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onAuthStateChange={() => setAuthStateChanged(true)}
       />
       <SettingsModal
         open={isSettingsModalOpen}

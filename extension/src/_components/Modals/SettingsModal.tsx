@@ -2,9 +2,9 @@
 import React from "react";
 import { useState } from "react";
 import { X, Settings, Palette, User, LogOut, ChevronRight } from "lucide-react";
-import ProfileSettings from "./_components/ProfileSettings";
-import AppearanceSettings from "./_components/AppearanceSettings";
-import WorkflowSettings from "./_components/WorkflowSettings";
+import ProfileSettings from "../Settings/ProfileSettings";
+import AppearanceSettings from "../Settings/AppearanceSettings";
+import { WorkflowSettings } from "../Settings/WorkflowSettings";
 
 interface SettingsModalProps {
   open: boolean;

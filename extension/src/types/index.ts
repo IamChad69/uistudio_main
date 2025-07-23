@@ -1,5 +1,19 @@
 // src/interfaces.ts
 
+// Extended User interface that includes subscription
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  profileImage: string;
+  subscription?: {
+    plan: {
+      name: string;
+      extractionLimit: number;
+    };
+  };
+}
+
 export interface ColorValue {
   rgb: string;
   hex: string;

@@ -26,4 +26,7 @@ export {
 } from "./jsxFormatter";
 
 // Export notification utilities
-export { showNotification } from "./notification";
+export { showNotification, showClipboardNotification } from "./notification";
+
+// Export clipboard utilities
+export { copyToClipboard, formatComponentForCopy } from "./clipboard";

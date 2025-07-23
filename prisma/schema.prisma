@@ -68,3 +68,16 @@ model Usage {
   points Int
   expire DateTime?
 }
+model Bookmark {
+  id         String   @id @default(cuid())
+  url        String
+  title      String?  @db.VarChar(255)
+  
+  userId     String
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@unique([userId, url])
+}

@@ -10,6 +10,7 @@ interface User {
   firstName?: string;
   lastName?: string;
   plan?: string;
+  hasProAccess?: boolean;
   totalPoints?: number;
   subscription?: {
     plan: {

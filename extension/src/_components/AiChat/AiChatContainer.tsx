@@ -12,6 +12,7 @@ interface Fragment {
   title: string;
   sandboxUrl: string;
   files: Record<string, string>;
+  generatedCode?: string; // Store the generated code for copying
 }
 
 interface Message {
@@ -100,6 +101,32 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
       const result = await generateCode(fullMessage);
 
       if (result.status === 200 && result.data) {
+        // Generate a simple React component based on the user's request
+        const componentName = "GeneratedComponent";
+        const generatedCode = `import React from 'react';
+
+interface ${componentName}Props {
+  // Add your props here
+}
+
+const ${componentName}: React.FC<${componentName}Props> = ({}) => {
+  return (
+    <div className="p-4 bg-white rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold text-gray-800 mb-2">
+        Generated Component
+      </h2>
+      <p className="text-gray-600">
+        This is a React component generated based on your request.
+      </p>
+      <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+        Click me
+      </button>
+    </div>
+  );
+};
+
+export default ${componentName};`;
+
         // Success - add assistant message with fragment
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -112,7 +139,10 @@ const AiChatContainer: React.FC<AiChatContainerProps> = ({
             id: result.data.projectId,
             title: "Component",
             sandboxUrl: `${config.APP_URL}/projects/${result.data.projectId}`,
-            files: {},
+            files: {
+              [`${componentName}.tsx`]: generatedCode,
+            },
+            generatedCode: generatedCode,
           },
         };
 
