@@ -1,5 +1,5 @@
 import React from "react";
-import { AiChatContainer } from "./AiChat/index";
+import { AiChatContainer } from "./index";
 
 interface AiChatProps {
   open: boolean;

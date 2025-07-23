@@ -1,19 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Crown, LogIn, UserPlus, ExternalLink } from "lucide-react";
-import config from "../config/environment";
+import config from "../../config/environment";
 import browser from "webextension-polyfill";
-import { useAuth } from "../hooks/useAuth";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  profileImage: string;
-  fullName?: string;
-  firstName?: string;
-  subscriptionPlan?: string;
-}
+import { useAuth } from "../../hooks/useAuth";
+import { isProUser } from "../../utils/status";
+import { User } from "../../types";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -348,7 +340,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
                 <div style={modalStyles.planBadge}>
                   <Crown size={14} />
-                  {auth.user?.subscription?.plan?.name || "free"}
+                  {auth.user ? (isProUser(auth.user) ? "pro" : "free") : "free"}
                 </div>
               </div>
             </div>

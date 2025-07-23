@@ -1,8 +1,8 @@
 import React from "react";
 import { formatDuration, intervalToDuration } from "date-fns";
 import { CrownIcon } from "lucide-react";
-import { useUsage } from "../hooks/useUsage";
-import { useAuth } from "../hooks/useAuth";
+import { useUsage } from "../../hooks/useUsage";
+import { useAuth } from "../../hooks/useAuth";
 
 interface UsageProps {
   className?: string;

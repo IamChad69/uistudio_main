@@ -79,3 +79,97 @@ export function convertFilesToTreeItems(
   const result = convertNode(tree);
   return Array.isArray(result) ? result : [result];
 }
+
+/**
+ * Extracts the main component from fragment files
+ * Excludes page.tsx, layout.tsx, and other framework files
+ */
+export function extractMainComponent(files: { [path: string]: string }): {
+  componentName: string;
+  componentCode: string;
+  componentPath: string;
+} | null {
+  // Files to exclude from being considered as main components
+  const excludedFiles = [
+    "page.tsx",
+    "layout.tsx",
+    "globals.css",
+    "tailwind.config.js",
+    "next.config.js",
+    "package.json",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "tsconfig.json",
+    "postcss.config.js",
+    "components.json",
+    ".gitignore",
+    "README.md",
+  ];
+
+  // Find the main component file
+  const componentFiles = Object.entries(files).filter(([path, content]) => {
+    // Exclude framework files
+    if (excludedFiles.some((excluded) => path.includes(excluded))) {
+      return false;
+    }
+
+    // Look for .tsx files that are likely components
+    if (path.endsWith(".tsx") && !path.includes("node_modules")) {
+      return true;
+    }
+
+    return false;
+  });
+
+  if (componentFiles.length === 0) {
+    return null;
+  }
+
+  // Prioritize files that look like main components
+  const mainComponentFile =
+    componentFiles.find(([path]) => {
+      // Prefer files that are directly in app/ or components/ directories
+      if (path.startsWith("app/") && !path.includes("/")) {
+        return true;
+      }
+      if (path.startsWith("components/")) {
+        return true;
+      }
+      return false;
+    }) || componentFiles[0];
+
+  const [componentPath, componentCode] = mainComponentFile;
+
+  // Extract component name from the file path
+  const fileName =
+    componentPath.split("/").pop()?.replace(".tsx", "") || "Component";
+
+  return {
+    componentName: fileName,
+    componentCode,
+    componentPath,
+  };
+}
+
+/**
+ * Formats component code for copying to clipboard
+ */
+export function formatComponentForCopy(
+  componentCode: string,
+  componentName: string
+): string {
+  // Remove any imports that reference @/ (since these won't work in a standalone context)
+  const cleanedCode = componentCode
+    .split("\n")
+    .filter((line) => {
+      // Keep lines that don't import from @/ paths
+      if (line.trim().startsWith("import") && line.includes("@/")) {
+        return false;
+      }
+      return true;
+    })
+    .join("\n");
+
+  return `// ${componentName}.tsx
+${cleanedCode}`;
+}

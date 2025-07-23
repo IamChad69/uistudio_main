@@ -16,7 +16,7 @@ import FragmentWeb from "../components/fragment-web";
 import { CodeIcon, EyeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Hint from "@/components/hint";
-import { RefreshCcw, ExternalLink, Link, Check } from "lucide-react";
+import { RefreshCcw, ExternalLink } from "lucide-react";
 import FileExplorer from "@/components/file-explorer";
 
 import { ErrorBoundary } from "react-error-boundary";
@@ -29,7 +29,6 @@ interface ProjectViewsProps {
 const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(data);
   const [tabState, setTabState] = useState<"preview" | "code">("preview");
-  const [copied, setCopied] = useState(false);
   const [fragmentKey, setFragmentKey] = useState(0);
 
   // Set initial fragment on mount
@@ -63,14 +62,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
     setFragmentKey((prev) => prev + 1);
   };
 
-  const handleCopy = () => {
-    if (!activeFragment?.sandboxUrl) return;
-    navigator.clipboard.writeText(activeFragment.sandboxUrl);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 3000);
-  };
+
 
   // Convert activeFragment.files to the correct format if it exists
   const fileCollection = activeFragment?.files
@@ -147,32 +139,6 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
                     <RefreshCcw size={16} className="text-muted-foreground" />
                   </Button>
                 </Hint>
-
-                {/* URL Display with Copy */}
-                <div className="bg-gray-900 rounded-lg px-3 py-2 flex items-center gap-2 min-w-0 max-w-[300px]">
-                  <Link size={16} className="text-gray-400 flex-shrink-0" />
-                  <span className="text-white text-sm font-mono truncate flex-1 min-w-0">
-                    {activeFragment?.sandboxUrl || "No URL available"}
-                  </span>
-                  <Hint text="Copy URL" side="bottom">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      disabled={!activeFragment?.sandboxUrl || copied}
-                      onClick={handleCopy}
-                      className="bg-white text-black hover:bg-gray-100 px-3 py-1 text-xs font-medium flex-shrink-0"
-                    >
-                      {copied ? (
-                        <>
-                          <Check size={12} className="mr-1" />
-                          Copied
-                        </>
-                      ) : (
-                        "Copy link"
-                      )}
-                    </Button>
-                  </Hint>
-                </div>
 
                 {/* Open in New Tab Button */}
                 <Hint text="Open in new tab" side="bottom" align="start">

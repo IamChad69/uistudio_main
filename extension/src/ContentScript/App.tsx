@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import FloatingButton from "../FloatingButton/FloatingButton";
-import ColorPicker from "../_components/ColorPicker";
-import { FontInspectorUI } from "../_components/fontInspectorUi";
+import FloatingButton from "../_components/MainButton/FloatingButton";
+import ColorPicker from "../_components/Ui/ColorPicker";
+import { FontInspectorUI } from "../_components/Ui/fontInspectorUi";
 import { logger } from "../utils/logger";
 
 // Add browser API declaration for cross-browser compatibility

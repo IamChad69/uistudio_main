@@ -33,7 +33,7 @@ export const projectsRouter = createTRPCRouter({
         updatedAt: "asc",
       },
     });
-    return projects;
+    return projects; 
   }),
 
   create: protectedProcedure

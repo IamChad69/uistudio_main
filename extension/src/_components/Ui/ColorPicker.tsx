@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
-
 interface ColorPickerProps {
   isActive: boolean;
   onClose: () => void;
@@ -193,7 +192,6 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ isActive, onClose }) => {
       const colorToCopy = currentColor; // Use the state which should be updated now
 
       if (!colorToCopy || colorToCopy === "#000000") {
-       
         onClose();
         return;
       }

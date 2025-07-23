@@ -1,6 +1,80 @@
 import React from "react";
 import ReactIcon from "../../assets/icons/react.svg";
 import LogoIcon from "../../assets/icons/logo-icon.svg";
+import {
+  copyToClipboard,
+  formatComponentForCopy,
+  showClipboardNotification,
+} from "../../utils";
+
+// Import the extractMainComponent function from the main utils
+// We need to create a simple version for the extension since the main utils might not be available
+function extractMainComponent(files: Record<string, string>): {
+  componentName: string;
+  componentCode: string;
+  componentPath: string;
+} | null {
+  // Files to exclude from being considered as main components
+  const excludedFiles = [
+    "page.tsx",
+    "layout.tsx",
+    "globals.css",
+    "tailwind.config.js",
+    "next.config.js",
+    "package.json",
+    "package-lock.json",
+    "pnpm-lock.yaml",
+    "tsconfig.json",
+    "postcss.config.js",
+    "components.json",
+    ".gitignore",
+    "README.md",
+  ];
+
+  // Find the main component file
+  const componentFiles = Object.entries(files).filter(([path, content]) => {
+    // Exclude framework files
+    if (excludedFiles.some((excluded) => path.includes(excluded))) {
+      return false;
+    }
+
+    // Look for .tsx files that are likely components
+    if (path.endsWith(".tsx") && !path.includes("node_modules")) {
+      return true;
+    }
+
+    return false;
+  });
+
+  if (componentFiles.length === 0) {
+    return null;
+  }
+
+  // Prioritize files that look like main components
+  const mainComponentFile =
+    componentFiles.find(([path]) => {
+      // Prefer files that are directly in app/ or components/ directories
+      if (path.startsWith("app/") && !path.includes("/")) {
+        return true;
+      }
+      if (path.startsWith("components/")) {
+        return true;
+      }
+      return false;
+    }) || componentFiles[0];
+
+  const [componentPath, componentCode] = mainComponentFile;
+
+  // Extract component name from the file path
+  const fileName =
+    componentPath.split("/").pop()?.replace(".tsx", "") || "Component";
+
+  return {
+    componentName: fileName,
+    componentCode,
+    componentPath,
+  };
+}
 
 interface UserMessageProps {
   content: string;
@@ -20,6 +94,7 @@ interface Fragment {
   title: string;
   sandboxUrl: string;
   files: Record<string, string>;
+  generatedCode?: string; // Store the generated code for copying
 }
 
 interface AssistantMessageProps {
@@ -95,6 +170,38 @@ const FragmentCard: React.FC<FragmentCardProps> = ({ fragment }) => {
     window.open(fragment.sandboxUrl, "_blank");
   };
 
+  const handleCopy = async () => {
+    let codeToCopy = "";
+    let componentName = "Component";
+
+    // First try to use the generatedCode if available
+    if (fragment.generatedCode) {
+      codeToCopy = fragment.generatedCode;
+      componentName = "GeneratedComponent";
+    } else {
+      // Fallback to extracting from files
+      const mainComponent = extractMainComponent(fragment.files);
+      if (mainComponent) {
+        codeToCopy = mainComponent.componentCode;
+        componentName = mainComponent.componentName;
+      }
+    }
+
+    if (codeToCopy) {
+      const formattedCode = formatComponentForCopy(codeToCopy, componentName);
+
+      const success = await copyToClipboard(formattedCode);
+
+      if (success) {
+        showClipboardNotification("Component copied to clipboard!");
+      } else {
+        console.error("Failed to copy component to clipboard");
+      }
+    } else {
+      console.error("No component code found to copy");
+    }
+  };
+
   return (
     <div style={fragmentCardStyles.container}>
       <button
@@ -116,6 +223,25 @@ const FragmentCard: React.FC<FragmentCardProps> = ({ fragment }) => {
           </div>
         </div>
         <div style={fragmentCardStyles.arrow}>→</div>
+      </button>
+
+      {/* Copy button */}
+      <button
+        style={fragmentCardStyles.copyButton}
+        onClick={handleCopy}
+        title="Copy Component Code"
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = "rgba(65, 105, 225, 0.2)";
+          e.currentTarget.style.borderColor = "rgba(65, 105, 225, 0.5)";
+          e.currentTarget.style.transform = "translateY(-1px)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = "rgba(65, 105, 225, 0.1)";
+          e.currentTarget.style.borderColor = "rgba(65, 105, 225, 0.3)";
+          e.currentTarget.style.transform = "translateY(0)";
+        }}
+      >
+        📋 Copy Component
       </button>
     </div>
   );
@@ -288,6 +414,25 @@ const fragmentCardStyles = {
     fontSize: "12px",
     color: "#bdbdbd",
     marginLeft: "8px",
+  },
+  copyButton: {
+    display: "block",
+    width: "100%",
+    padding: "8px 12px",
+    backgroundColor: "rgba(65, 105, 225, 0.1)",
+    border: "1px solid rgba(65, 105, 225, 0.3)",
+    borderRadius: "6px",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    color: "#4169e1",
+    textDecoration: "none",
+    outline: "none",
+    textAlign: "center" as const,
+    fontSize: "11px",
+    fontWeight: "500",
+    marginTop: "8px",
+    fontFamily: "system-ui, -apple-system, sans-serif",
+    transform: "translateY(0)",
   },
 };
 

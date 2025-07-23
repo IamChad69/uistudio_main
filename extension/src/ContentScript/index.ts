@@ -3,9 +3,9 @@ import * as ReactDOMClient from "react-dom/client";
 import browser from "webextension-polyfill";
 import App, { AppProps } from "./App";
 import { logger } from "../utils/logger";
-import { UIScraper } from "../lib/UIScraper";
+import { UIScraper } from "../actions/UIScraper";
 import config from "../config/environment";
-import { AssetExtractor } from "../lib/AssetExtractor";
+import { AssetExtractor } from "../actions/AssetExtractor";
 
 // --- Main Content Script Class ---
 
