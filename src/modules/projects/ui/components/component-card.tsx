@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Fragment } from "@/generated/prisma";
 import Link from "next/link";
 import {
@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { extractMainComponent, formatComponentForCopy } from "@/lib/utils";
 import { toast } from "sonner";
+import { useCurrentTheme } from "@/hooks/use-current-theme";
 
 interface ComponentCardProps {
   fragment: Fragment & {
@@ -24,6 +25,30 @@ interface ComponentCardProps {
 
 const ComponentCard: React.FC<ComponentCardProps> = ({ fragment }) => {
   const [copied, setCopied] = useState(false);
+  const [iframeKey, setIframeKey] = useState(0);
+  const currentTheme = useCurrentTheme();
+
+  // Update iframe when theme changes
+  useEffect(() => {
+    setIframeKey((prev) => prev + 1);
+  }, [currentTheme]);
+
+  // Create sandbox URL with theme parameter
+  const getSandboxUrlWithTheme = (
+    baseUrl: string,
+    theme: string | undefined
+  ) => {
+    try {
+      const url = new URL(baseUrl);
+      if (theme) {
+        url.searchParams.set("theme", theme);
+      }
+      return url.toString();
+    } catch (error) {
+      // If URL parsing fails, return the original URL
+      return baseUrl;
+    }
+  };
 
   const handleCopyComponent = async () => {
     if (!fragment.files) {
@@ -65,10 +90,11 @@ const ComponentCard: React.FC<ComponentCardProps> = ({ fragment }) => {
 
   return (
     <div className="group relative w-full">
-      <div className="p-0 flex-1 relative h-[400px] rounded-md overflow-hidden bg-white border border-border">
+      <div className="p-0 flex-1 relative h-[400px] rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200">
         <div className="absolute inset-0 ">
           <iframe
-            src={fragment.sandboxUrl}
+            key={iframeKey}
+            src={getSandboxUrlWithTheme(fragment.sandboxUrl, currentTheme)}
             className="w-full h-full  "
             loading="lazy"
             sandbox="allow-scripts allow-forms allow-same-origin"

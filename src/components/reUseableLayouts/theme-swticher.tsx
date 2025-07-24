@@ -5,20 +5,23 @@ import { useEffect, useState } from "react";
 type TTheme = "light" | "dark";
 
 export const ThemeSwitcher = () => {
-  const getInitialTheme = (): TTheme => {
-    if (typeof window === "undefined") {
-      return "light";
-    }
-    return (localStorage.getItem("theme") as TTheme) || "light";
-  };
+  const [theme, setTheme] = useState<TTheme>("light");
+  const [mounted, setMounted] = useState(false);
 
-  const [theme, setTheme] = useState<TTheme>(getInitialTheme);
+  // Initialize theme after component mounts to avoid hydration mismatch
+  useEffect(() => {
+    const savedTheme = (localStorage.getItem("theme") as TTheme) || "light";
+    setTheme(savedTheme);
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    if (mounted) {
+      const root = document.documentElement;
+      root.classList.toggle("dark", theme === "dark");
+      localStorage.setItem("theme", theme);
+    }
+  }, [theme, mounted]);
 
   return (
     <fieldset className="flex flex-col h-16 w-8 p-0 m-0 transition-colors duration-300">
@@ -37,11 +40,12 @@ export const ThemeSwitcher = () => {
         />
         <label
           htmlFor="theme-switch-light"
-          className={`flex items-center justify-center h-8 w-8 cursor-pointer  group transition-all duration-300 ${
-            theme === "light"
-              ? " dark:bg-background  "
-              : "hover:bg-accent dark:hover:bg-accent dark:hover:border-border rounded-md"
-          }`}
+          className={
+            "flex items-center justify-center h-8 w-8 cursor-pointer group transition-all duration-300" +
+            (theme === "light"
+              ? " dark:bg-background"
+              : " hover:bg-accent dark:hover:bg-accent dark:hover:border-border rounded-md")
+          }
         >
           <span className="sr-only">light</span>
           <svg
@@ -77,11 +81,12 @@ export const ThemeSwitcher = () => {
         />
         <label
           htmlFor="theme-switch-dark"
-          className={`flex items-center justify-center h-8 w-8 cursor-pointer group transition-all duration-300 ${
-            theme === "dark"
-              ? "bg-white dark:bg-background  shadow-sm"
-              : "hover:bg-gray-50 dark:hover:bg-accent"
-          }`}
+          className={
+            "flex items-center justify-center h-8 w-8 cursor-pointer group transition-all duration-300" +
+            (theme === "dark"
+              ? " dark:bg-background"
+              : " hover:bg-accent dark:hover:bg-accent dark:hover:border-border rounded-md")
+          }
         >
           <span className="sr-only">dark</span>
           <svg
