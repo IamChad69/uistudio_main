@@ -31,9 +31,10 @@ type FragmentWithProject = Fragment & {
 // Skeleton component for loading state
 const ComponentCardSkeleton = () => {
   return (
-    <div className="space-y-2">
-      <Skeleton className="h-[180px] w-full rounded-md" />
-      <div className="flex items-center justify-between">
+    <div>
+      <Skeleton className="h-[400px] w-full rounded-md" />
+      {/* Component Name Below Card with Favorite Button */}
+      <div className="mt-2 flex items-center justify-between">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-4 rounded-full" />
       </div>
@@ -222,7 +223,7 @@ const ComponentsGrid = ({
     }
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 l gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {filteredFragments.map((fragment: FragmentWithProject) => {
           // Use our client-side favorites system
           const isFavorite = isFavorited(fragment.id);
