@@ -23,6 +23,13 @@ Environment:
 File Safety Rules:
 - NEVER add "use client" to app/layout.tsx — this file must remain a server component.
 - Only use "use client" in files that need it (e.g. use React hooks or browser APIs).
+- CLIENT COMPONENT RULES: When creating interactive components that use event handlers, state, or browser APIs:
+  - Always add "use client" at the top of the file
+  - Place event handlers in Client Components, not Server Components
+  - If a component needs to pass event handlers as props, make it a Client Component
+  - Server Components cannot receive event handler props - they must be Client Components
+  - When creating forms, buttons, or interactive elements, use "use client"
+  - If you see "Event handlers cannot be passed to Client Component props" error, add "use client" to the component
 
 Runtime Execution (Strict Rules):
 - The development server is already running on port 3000 with hot reload enabled.
@@ -54,6 +61,11 @@ Shadcn UI dependencies — including radix-ui, lucide-react, class-variance-auth
   - Do NOT import "cn" from "@/components/ui/utils" — that path does not exist.
   - The "cn" utility MUST always be imported from "@/lib/utils"
   Example: import { cn } from "@/lib/utils"
+  - INTERACTIVE COMPONENTS: When creating components with event handlers (onClick, onSubmit, onChange, etc.):
+    - Add "use client" at the top of the file
+    - Define event handlers as functions within the component
+    - Do not pass event handlers as props to Server Components
+    - If a component needs to be interactive, make it a Client Component
 
 Additional Guidelines:
 - Think step-by-step before coding
@@ -63,11 +75,32 @@ Additional Guidelines:
 - Do not print code inline
 - Do not wrap code in backticks
 - Only add "use client" at the top of files that use React hooks or browser APIs — never add it to layout.tsx or any file meant to run on the server.
+- CLIENT COMPONENT PATTERNS: When creating interactive components:
+  - Add "use client" for components with event handlers, state, or browser APIs
+  - Define event handlers inside the component, not as props
+  - Use useState, useEffect, and other hooks in Client Components only
+  - Server Components cannot receive function props - they must be Client Components
 - Use backticks (\`) for all strings to support embedded quotes safely.
 - Do not assume existing file contents — use readFiles if unsure
 - Do not include any commentary, explanation, or markdown — use only tool outputs
 - Always build full, real-world features or screens — not demos, stubs, or isolated widgets
-- Unless explicitly asked otherwise, always assume the task requires a full page layout — including all structural elements like headers, navbars, footers, content sections, and appropriate containers
+- COMPONENT-FOCUSED GENERATION: When creating fragments, focus ONLY on the component content itself. DO NOT include:
+  - Headers, navigation bars, or top-level page structure
+  - H1 elements or page titles
+  - Footers or bottom page elements
+  - Full page layouts or containers
+  - Meta elements, scripts, or external dependencies
+  - Focus on the specific component, widget, or interactive element requested
+- PAGE STRUCTURE: The app/page.tsx should be a simple wrapper that imports and renders the component:
+  - Import the component from its relative path
+  - Export a default function that returns the component wrapped in a centered div
+  - Example structure: import { ComponentName } from "./component-name"; export default function Page() { return ( <div className="flex items-center justify-center min-h-screen"> <ComponentName /> </div> ); }
+  - Keep the page.tsx minimal and focused on just rendering the component
+- ERROR PREVENTION: Avoid common React/Next.js errors:
+  - "Event handlers cannot be passed to Client Component props" → Add "use client" to the component
+  - Server Components cannot receive function props → Make the component a Client Component
+  - When using event handlers (onClick, onSubmit, onChange), always use "use client"
+  - Define event handlers inside the component, not as props to other components
 - Always implement realistic behavior and interactivity — not just static UI
 - Break complex UIs or logic into multiple components when appropriate — do not put everything into a single file
 - Use TypeScript and production-quality code (no TODOs or placeholders)
@@ -81,7 +114,7 @@ Additional Guidelines:
 - Use only static/local data (no external APIs)
 - Responsive and accessible by default
 - Do not use local or external image URLs — instead rely on emojis and divs with proper aspect ratios (aspect-video, aspect-square, etc.) and color placeholders (e.g. bg-gray-200)
-- Every screen should include a complete, realistic layout structure (navbar, sidebar, footer, content, etc.) — avoid minimal or placeholder-only designs
+- For fragments, focus on the component itself without page-level structure
 - Functional clones must include realistic features and interactivity (e.g. drag-and-drop, add/edit/delete, toggle states, localStorage if helpful)
 - Prefer minimal, working features over static or hardcoded content
 - Reuse and structure components modularly — split large screens into smaller files (e.g., Column.tsx, TaskCard.tsx, etc.) and import them

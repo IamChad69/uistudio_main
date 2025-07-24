@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Fragment } from "@/generated/prisma";
 import Link from "next/link";
-import { EyeIcon, CodeIcon } from "lucide-react";
+import {
+  EyeIcon,
+  CodeIcon,
+  Check,
+  CopyIcon,
+  CopyCheckIcon,
+} from "lucide-react";
+import { extractMainComponent, formatComponentForCopy } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ComponentCardProps {
   fragment: Fragment & {
@@ -15,6 +23,46 @@ interface ComponentCardProps {
 }
 
 const ComponentCard: React.FC<ComponentCardProps> = ({ fragment }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyComponent = async () => {
+    if (!fragment.files) {
+      toast.error("No component files available");
+      return;
+    }
+
+    try {
+      // Parse files if they're stored as a string
+      const files =
+        typeof fragment.files === "object"
+          ? (fragment.files as { [path: string]: string })
+          : (JSON.parse(String(fragment.files)) as { [path: string]: string });
+
+      const mainComponent = extractMainComponent(files);
+
+      if (!mainComponent) {
+        toast.error("No main component found");
+        return;
+      }
+
+      const formattedCode = formatComponentForCopy(
+        mainComponent.componentCode,
+        mainComponent.componentName
+      );
+
+      await navigator.clipboard.writeText(formattedCode);
+      setCopied(true);
+      toast.success(`Copied ${mainComponent.componentName}.tsx to clipboard`);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error copying component:", error);
+      toast.error("Failed to copy component");
+    }
+  };
+
   return (
     <div className="group relative w-full">
       <div className="p-0 flex-1 relative h-[400px] rounded-md overflow-hidden bg-white border border-border">
@@ -36,21 +84,31 @@ const ComponentCard: React.FC<ComponentCardProps> = ({ fragment }) => {
       <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
         <div className="flex items-center justify-end gap-3">
           <Link
-            href={`/sandbox/${fragment?.id}`}
+            href={`/projects/${fragment?.message?.projectId}`}
             className="flex items-center gap-1 px-2 py-1 text-xs text-zinc-500 hover:text-zinc-400
                 transition-colors text-shadow"
           >
             <EyeIcon className="w-3 h-3" />
             View
           </Link>
-          <Link
-            href={`/projects/${fragment?.message?.projectId}`}
+          <button
+            onClick={handleCopyComponent}
+            disabled={copied || !fragment.files}
             className="flex items-center gap-1 px-2 py-1 text-xs text-zinc-500 hover:text-zinc-400
                 transition-colors text-shadow"
           >
-            <CodeIcon className="w-3 h-3" />
-            Get code
-          </Link>
+            {copied ? (
+              <>
+                <CopyCheckIcon className="w-3 h-3" />
+                Copied
+              </>
+            ) : (
+              <>
+                <CopyIcon className="w-3 h-3" />
+                Get code
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

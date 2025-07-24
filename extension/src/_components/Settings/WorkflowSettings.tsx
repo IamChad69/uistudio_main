@@ -7,6 +7,7 @@ import { useAuth } from "../../hooks/useAuth";
 import Switch from "../Ui/Switch";
 import { Framework } from "../../types";
 import useFramework from "../../hooks/useFramework";
+import { autoSaveManager } from "../../utils/autoSave";
 
 type FrameworkType = {
   id: Framework;
@@ -107,6 +108,48 @@ export const WorkflowSettings: React.FC = () => {
     "local"
   );
 
+  // Auto-save functionality
+  const handleAutoSaveToggle = async (value: boolean) => {
+    if (isAuthenticated) {
+      console.log("Setting autoSaveResults to:", value);
+      setAutoSaveResults(value);
+
+      // Update the auto-save manager
+      await autoSaveManager.setAutoSaveEnabled(value);
+
+      // If enabling auto-save, check for pending scraped code and save it
+      if (value) {
+        await handleAutoSavePendingResults();
+      }
+    }
+  };
+
+  const handleAutoSavePendingResults = async () => {
+    try {
+      // Get any pending scraped code from storage
+      const pendingCode = await autoSaveManager.getPendingCode();
+      if (!pendingCode) {
+        console.log("No pending scraped code to auto-save");
+        return;
+      }
+
+      console.log("Auto-saving pending scraped code...");
+
+      // Use the auto-save manager to trigger the save
+      const success = await autoSaveManager.triggerAutoSave({
+        scrapedCode: pendingCode,
+        context: "Auto-saved from extension",
+      });
+
+      if (success) {
+        // Clear the pending scraped code after successful save
+        await autoSaveManager.clearPendingCode();
+      }
+    } catch (error) {
+      console.error("Error during auto-save:", error);
+    }
+  };
+
   // Handle framework selection
   const handleFrameworkChange = (framework: Framework) => {
     const selectedFrameworkObj = FRAMEWORKS.find((f) => f.id === framework);
@@ -158,12 +201,7 @@ export const WorkflowSettings: React.FC = () => {
             }
             isPremium={!isAuthenticated}
             checked={isAuthenticated && autoSaveResults}
-            onChange={(value: boolean) => {
-              if (isAuthenticated) {
-                console.log("Setting autoSaveResults to:", value);
-                setAutoSaveResults(value);
-              }
-            }}
+            onChange={handleAutoSaveToggle}
             disabled={!isAuthenticated}
           />
 
