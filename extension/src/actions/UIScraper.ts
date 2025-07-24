@@ -1018,10 +1018,10 @@ ${htmlContent}
       // Get the selected framework and auto-save setting
       const result = await browser.storage.local.get([
         "selected_framework",
-        "auto_save",
+        "auto_save_results",
       ]);
       const selectedFramework = (result.selected_framework as string) || "html";
-      const autoSave = result.auto_save !== false; // Default to true if not set
+      const autoSave = result.auto_save_results !== false; // Default to true if not set
 
       // If auto-save is disabled, don't save the component
       if (!autoSave) {
@@ -1066,7 +1066,42 @@ ${htmlContent}
         ? `${(elementData.styles as Record<string, string>).width || "auto"} x ${(elementData.styles as Record<string, string>).height || "auto"}`
         : "auto x auto";
 
-      // Prepare component data
+      // Create the scraped code representation
+      const scrapedCode = this.createHtmlRepresentation(elementData);
+
+      // Import and use the auto-save manager
+      const { autoSaveManager } = await import("../utils/autoSave");
+
+      // Check if auto-save is enabled
+      const isAutoSaveEnabled = await autoSaveManager.isAutoSaveEnabled();
+
+      if (isAutoSaveEnabled) {
+        console.log("🔍 uiScraper: Auto-save enabled, triggering save...");
+
+        // Trigger auto-save with the scraped code
+        const success = await autoSaveManager.triggerAutoSave({
+          scrapedCode,
+          context: `Scraped from ${window.location.href} using ${selectedFramework} framework`,
+        });
+
+        if (success) {
+          showClipboardNotification(
+            `Component auto-saved successfully as ${selectedFramework}!`
+          );
+        } else {
+          // If auto-save fails, store as pending code
+          await autoSaveManager.storePendingCode(scrapedCode);
+          showClipboardNotification(
+            `Component saved as pending (auto-save failed). Enable auto-save in settings to retry.`
+          );
+        }
+      } else {
+        // Store as pending code for later auto-save
+        await autoSaveManager.storePendingCode(scrapedCode);
+        console.log("🔍 uiScraper: Auto-save disabled, stored as pending code");
+      }
+
+      // Prepare component data for legacy compatibility
       const componentData = {
         html: elementData.outerHtml as string,
         css: JSON.stringify(elementData.styles || {}),
@@ -1074,16 +1109,12 @@ ${htmlContent}
         htmlImages,
         dimensions,
         url: window.location.href,
-        framework: selectedFramework, // Use the selected framework instead of hardcoding 'html'
+        framework: selectedFramework,
       };
-
-      // Save component using the existing service
-      //const saveResult = await ComponentService.saveComponent(componentData);
-      //console.log("🔍 uiScraper: Component saved successfully", saveResult);
 
       // Show notification
       showClipboardNotification(
-        `Component saved successfully as ${selectedFramework}!`
+        `Component processed successfully as ${selectedFramework}!`
       );
     } catch (error) {
       console.error("🔍 uiScraper: Failed to save component", error);

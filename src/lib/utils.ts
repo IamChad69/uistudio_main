@@ -126,8 +126,13 @@ export function extractMainComponent(files: { [path: string]: string }): {
   }
 
   // Prioritize files that look like main components
+  // First, look for files that are not page.tsx or layout.tsx
   const mainComponentFile =
     componentFiles.find(([path]) => {
+      // Exclude page.tsx and layout.tsx explicitly
+      if (path.endsWith("page.tsx") || path.endsWith("layout.tsx")) {
+        return false;
+      }
       // Prefer files that are directly in app/ or components/ directories
       if (path.startsWith("app/") && !path.includes("/")) {
         return true;
@@ -170,6 +175,39 @@ export function formatComponentForCopy(
     })
     .join("\n");
 
+  // Extract just the component function/JSX, removing page-level structure
+  const lines = cleanedCode.split("\n");
+  const componentStartIndex = lines.findIndex(
+    (line) =>
+      line.includes("export default function") ||
+      (line.includes("function") && line.includes("(") && line.includes(")")) ||
+      (line.includes("const") &&
+        line.includes("=") &&
+        line.includes("(") &&
+        line.includes(")"))
+  );
+
+  if (componentStartIndex !== -1) {
+    const componentLines = lines.slice(componentStartIndex);
+    return `// ${componentName}.tsx
+${componentLines.join("\n")}`;
+  }
+
   return `// ${componentName}.tsx
 ${cleanedCode}`;
+}
+
+/**
+ * Generates a clean page structure that just imports and renders the component
+ */
+export function generatePageStructure(componentName: string): string {
+  return `import { ${componentName} } from "./${componentName.toLowerCase()}"
+
+export default function Page() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <${componentName} />
+    </div>
+  )
+}`;
 }

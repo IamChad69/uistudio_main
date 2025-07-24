@@ -13,11 +13,13 @@ import { Suspense, useState, useEffect } from "react";
 import { Fragment } from "@/generated/prisma";
 import ProjectHeader from "../components/project-Header";
 import FragmentWeb from "../components/fragment-web";
-import { CodeIcon, EyeIcon } from "lucide-react";
+import { CodeIcon, EyeIcon, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Hint from "@/components/hint";
 import { RefreshCcw, ExternalLink } from "lucide-react";
 import FileExplorer from "@/components/file-explorer";
+import { extractMainComponent, formatComponentForCopy } from "@/lib/utils";
+import { toast } from "sonner";
 
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -30,6 +32,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(data);
   const [tabState, setTabState] = useState<"preview" | "code">("preview");
   const [fragmentKey, setFragmentKey] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   // Set initial fragment on mount
   useEffect(() => {
@@ -62,7 +65,41 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
     setFragmentKey((prev) => prev + 1);
   };
 
+  const handleCopyComponent = async () => {
+    if (!activeFragment?.files) {
+      toast.error("No component files available");
+      return;
+    }
 
+    try {
+      // Parse files if they're stored as a string
+      const files =
+        typeof activeFragment.files === "object"
+          ? (activeFragment.files as { [path: string]: string })
+          : (JSON.parse(String(activeFragment.files)) as {
+              [path: string]: string;
+            });
+
+      const mainComponent = extractMainComponent(files);
+
+      if (!mainComponent) {
+        toast.error("No main component found");
+        return;
+      }
+
+      // Copy the raw component code instead of formatted code
+      await navigator.clipboard.writeText(mainComponent.componentCode);
+      setCopied(true);
+      toast.success(`Copied ${mainComponent.componentPath} to clipboard`);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error copying component:", error);
+      toast.error("Failed to copy component");
+    }
+  };
 
   // Convert activeFragment.files to the correct format if it exists
   const fileCollection = activeFragment?.files
@@ -128,6 +165,29 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
               </TabsList>
 
               <div className="flex items-center gap-x-2 ml-auto">
+                {/* Copy Component Button */}
+                <Hint text="Copy component code" side="bottom" align="start">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyComponent}
+                    disabled={copied || !activeFragment?.files}
+                    className="gap-2"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        Copy Component
+                      </>
+                    )}
+                  </Button>
+                </Hint>
+
                 {/* Refresh Button */}
                 <Hint text="Refresh the fragment" side="bottom" align="start">
                   <Button

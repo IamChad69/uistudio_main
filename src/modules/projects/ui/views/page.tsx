@@ -1,77 +1,57 @@
-// HighlightTabs.tsx
 "use client";
 
-import * as React from "react";
-import { EyeIcon, CodeIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { PlusIcon, MessageSquareMoreIcon } from "lucide-react";
+import { useState } from "react";
 
-export type TabOption = {
-  label: string;
-  icon: React.ReactNode;
-  value: string;
-};
+export function ComponentsToolbar({ onCreate }: { onCreate: () => void }) {
+  return (
+    <div className="w-full px-4 py-2 pt-2 sticky top-0 z-10 flex justify-between items-center flex-wrap gap-4 uiscraper-highlight">
+      <div className="px-4 py-2 flex justify-center font-bold items-center rounded-md bg-background border border-border text-primary capitalize">
+        components
+      </div>
+      <div className="flex gap-4 items-center flex-wrap">
+        <Button
+          variant="outline"
+          size="default"
+          className="bg-background/50 backdrop-blur-sm border hover:bg-accent/50 hover:border-solid transition-all duration-200"
+        >
+          <MessageSquareMoreIcon />
+        </Button>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="default"
+            className="bg-background/50 backdrop-blur-sm border-dashed hover:bg-accent/50 hover:border-solid transition-all duration-200"
+          >
+            <PlusIcon className="h-4 w-4" />
+            Create Component
+          </Button>
+        </DialogTrigger>
+      </div>
+    </div>
+  );
+}
 
-const TABS: TabOption[] = [
-  {
-    label: "Demo",
-    icon: <EyeIcon className="size-4" aria-hidden="true" />,
-    value: "demo",
-  },
-  {
-    label: "Code",
-    icon: <CodeIcon className="size-4" aria-hidden="true" />,
-    value: "code",
-  },
-];
-
-export function HighlightTabs({
-  className,
-  style,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const [active, setActive] = React.useState("demo");
+export default function ComponentsHeader() {
+  const [open, setOpen] = useState(false);
 
   return (
-    <div
-      role="tablist"
-      aria-orientation="horizontal"
-      tabIndex={0}
-      data-slot="tabs-list"
-      data-orientation="horizontal"
-      className={[
-        "bg-muted text-muted-foreground inline-flex w-fit items-center justify-center h-8 p-0 border rounded-full",
-        "w-[155.531px] h-[32px] text-[oklch(0.708_0_0)] bg-[rgba(255,87,34,0.05)] text-base font-sans font-normal p-[0px] m-0 border flex relative rounded-[16777216px]",
-        className,
-      ].join(" ")}
-      style={{ outline: "none", ...style }}
-      {...props}
-    >
-      {TABS.map((tab) => (
-        <button
-          key={tab.value}
-          type="button"
-          role="tab"
-          aria-selected={active === tab.value}
-          aria-controls={`highlight-tab-content-${tab.value}`}
-          data-state={active === tab.value ? "active" : "inactive"}
-          id={`highlight-tab-trigger-${tab.value}`}
-          data-slot="tabs-trigger"
-          tabIndex={-1}
-          data-orientation="horizontal"
-          onClick={() => setActive(tab.value)}
-          className={[
-            "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring",
-            "dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground",
-            "inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1",
-            "disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 rounded-full",
-            active === tab.value
-              ? "bg-background text-foreground shadow-sm"
-              : "",
-          ].join(" ")}
-        >
-          {tab.icon}
-          <span>{tab.label}</span>
-        </button>
-      ))}
-    </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <ComponentsToolbar onCreate={() => setOpen(true)} />
+      <DialogContent showCloseButton onInteractOutside={() => setOpen(false)}>
+        <DialogHeader>
+          <DialogTitle>Create Component</DialogTitle>
+        </DialogHeader>
+        {/* Add your form or content here */}
+        <DialogFooter>
+          <Button onClick={() => setOpen(false)} variant="outline">
+            Cancel
+          </Button>
+          <Button type="submit">Create</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
