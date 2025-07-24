@@ -10,7 +10,6 @@ interface ApiResponse<T = any> {
 
 interface GenerateCodeRequest {
   value: string;
-  token: string;
 }
 
 interface GenerateCodeResponse {
@@ -56,11 +55,11 @@ export async function generateCode(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
       body: JSON.stringify({
         value,
-        token,
-      } as GenerateCodeRequest),
+      }),
     });
 
     const data = await response.json();

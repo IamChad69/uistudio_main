@@ -5,7 +5,7 @@ import { logger } from "../utils/logger";
 interface UseAutoSaveReturn {
   triggerAutoSave: (scrapedCode: string, context?: string) => Promise<boolean>;
   storePendingCode: (code: string) => Promise<void>;
-  isAutoSaveEnabled: () => Promise<boolean>;
+  isAutoSaveEnabled: () => boolean;
 }
 
 export const useAutoSave = (): UseAutoSaveReturn => {
@@ -33,9 +33,9 @@ export const useAutoSave = (): UseAutoSaveReturn => {
     }
   }, []);
 
-  const isAutoSaveEnabled = useCallback(async (): Promise<boolean> => {
+  const isAutoSaveEnabled = useCallback((): boolean => {
     try {
-      return await autoSaveManager.isAutoSaveEnabled();
+      return autoSaveManager.isAutoSaveEnabled();
     } catch (error) {
       logger.error("Error checking auto-save state from hook:", error);
       return false;

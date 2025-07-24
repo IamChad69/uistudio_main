@@ -26,17 +26,36 @@ const ComponentCard: React.FC<ComponentCardProps> = ({ fragment }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopyComponent = async () => {
-    if (!fragment.files) {
+    if (
+      !fragment.files ||
+      (typeof fragment.files === "object" &&
+        fragment.files !== null &&
+        Object.keys(fragment.files).length === 0)
+    ) {
       toast.error("No component files available");
       return;
     }
 
+    // Check clipboard API availability
+    if (!navigator.clipboard) {
+      toast.error("Clipboard not supported in this browser");
+      return;
+    }
+
     try {
-      // Parse files if they're stored as a string
-      const files =
-        typeof fragment.files === "object"
-          ? (fragment.files as { [path: string]: string })
-          : (JSON.parse(String(fragment.files)) as { [path: string]: string });
+      let files: { [path: string]: string };
+
+      if (typeof fragment.files === "object" && fragment.files !== null) {
+        files = fragment.files as { [path: string]: string };
+      } else if (typeof fragment.files === "string") {
+        try {
+          files = JSON.parse(fragment.files);
+        } catch (parseError) {
+          throw new Error("Invalid JSON format in fragment files");
+        }
+      } else {
+        throw new Error("Unsupported fragment files format");
+      }
 
       const mainComponent = extractMainComponent(files);
 

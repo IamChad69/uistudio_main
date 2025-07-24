@@ -1,11 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PlusIcon, MessageSquareMoreIcon } from "lucide-react";
 import { useState } from "react";
 
-export function ComponentsToolbar({ onCreate }: { onCreate: () => void }) {
+export function ComponentsToolbar() {
   return (
     <div className="w-full px-4 py-2 pt-2 sticky top-0 z-10 flex justify-between items-center flex-wrap gap-4 uiscraper-highlight">
       <div className="px-4 py-2 flex justify-center font-bold items-center rounded-md bg-background border border-border text-primary capitalize">
@@ -39,7 +46,7 @@ export default function ComponentsHeader() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <ComponentsToolbar onCreate={() => setOpen(true)} />
+      <ComponentsToolbar />
       <DialogContent showCloseButton onInteractOutside={() => setOpen(false)}>
         <DialogHeader>
           <DialogTitle>Create Component</DialogTitle>

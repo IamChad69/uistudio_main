@@ -144,9 +144,15 @@ export const WorkflowSettings: React.FC = () => {
       if (success) {
         // Clear the pending scraped code after successful save
         await autoSaveManager.clearPendingCode();
+        // Consider showing success notification to user
+        console.log("Auto-save completed successfully");
+      } else {
+        throw new Error("Auto-save failed");
       }
     } catch (error) {
       console.error("Error during auto-save:", error);
+      // Consider showing error notification to user
+      // or updating UI state to indicate failure
     }
   };
 

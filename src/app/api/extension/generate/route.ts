@@ -36,13 +36,26 @@ export async function OPTIONS(request: Request) {
 
 const generateSchema = z.object({
   value: z.string().min(1, { message: "Message is required" }),
-  token: z.string().min(1, { message: "Token is required" }),
 });
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { value, token } = generateSchema.parse(body);
+    const { value } = generateSchema.parse(body);
+
+    // Extract token from Authorization header
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return addCorsHeaders(
+        NextResponse.json(
+          { status: 401, error: "Missing or invalid Authorization header" },
+          { status: 401 }
+        ),
+        request
+      );
+    }
+    
+    const token = authHeader.substring(7); // Remove "Bearer " prefix
 
     // Verify the extension auth token
     const authResult = await verifyExtensionAuthToken(token);

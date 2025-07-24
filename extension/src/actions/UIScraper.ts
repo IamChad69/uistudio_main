@@ -1015,21 +1015,9 @@ ${htmlContent}
     elementData: Record<string, unknown>
   ): Promise<void> {
     try {
-      // Get the selected framework and auto-save setting
-      const result = await browser.storage.local.get([
-        "selected_framework",
-        "auto_save_results",
-      ]);
+      // Get the selected framework
+      const result = await browser.storage.local.get(["selected_framework"]);
       const selectedFramework = (result.selected_framework as string) || "html";
-      const autoSave = result.auto_save_results !== false; // Default to true if not set
-
-      // If auto-save is disabled, don't save the component
-      if (!autoSave) {
-        console.log(
-          "🔍 uiScraper: Auto-save is disabled, skipping component save"
-        );
-        return;
-      }
 
       // Extract images from the element
       const htmlImages: string[] = [];
@@ -1073,7 +1061,7 @@ ${htmlContent}
       const { autoSaveManager } = await import("../utils/autoSave");
 
       // Check if auto-save is enabled
-      const isAutoSaveEnabled = await autoSaveManager.isAutoSaveEnabled();
+      const isAutoSaveEnabled = autoSaveManager.isAutoSaveEnabled();
 
       if (isAutoSaveEnabled) {
         console.log("🔍 uiScraper: Auto-save enabled, triggering save...");

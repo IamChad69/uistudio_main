@@ -9,7 +9,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import MessageContainer from "../components/message-container";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import { Fragment } from "@/generated/prisma";
 import ProjectHeader from "../components/project-Header";
 import FragmentWeb from "../components/fragment-web";
@@ -28,11 +28,30 @@ interface ProjectViewsProps {
   data: Fragment;
 }
 
+/**
+ * Helper function to parse fragment files into the correct format
+ * @param files - The files from a fragment, can be object or string
+ * @returns Parsed files object or null if parsing fails
+ */
+const parseFragmentFiles = (files: any): { [path: string]: string } | null => {
+  if (!files) return null;
+
+  try {
+    return typeof files === "object"
+      ? (files as { [path: string]: string })
+      : (JSON.parse(String(files)) as { [path: string]: string });
+  } catch (error) {
+    console.error("Error parsing fragment files:", error);
+    return null;
+  }
+};
+
 const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(data);
   const [tabState, setTabState] = useState<"preview" | "code">("preview");
   const [fragmentKey, setFragmentKey] = useState(0);
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Set initial fragment on mount
   useEffect(() => {
@@ -61,6 +80,15 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
     };
   }, []);
 
+  // Cleanup timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const onRefresh = () => {
     setFragmentKey((prev) => prev + 1);
   };
@@ -72,13 +100,12 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
     }
 
     try {
-      // Parse files if they're stored as a string
-      const files =
-        typeof activeFragment.files === "object"
-          ? (activeFragment.files as { [path: string]: string })
-          : (JSON.parse(String(activeFragment.files)) as {
-              [path: string]: string;
-            });
+      const files = parseFragmentFiles(activeFragment.files);
+
+      if (!files) {
+        toast.error("Failed to parse component files");
+        return;
+      }
 
       const mainComponent = extractMainComponent(files);
 
@@ -92,7 +119,13 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
       setCopied(true);
       toast.success(`Copied ${mainComponent.componentPath} to clipboard`);
 
-      setTimeout(() => {
+      // Clear existing timeout if any
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      // Set new timeout and store the ID
+      timeoutRef.current = setTimeout(() => {
         setCopied(false);
       }, 2000);
     } catch (error) {
@@ -102,11 +135,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
   };
 
   // Convert activeFragment.files to the correct format if it exists
-  const fileCollection = activeFragment?.files
-    ? typeof activeFragment.files === "object"
-      ? (activeFragment.files as { [path: string]: string })
-      : (JSON.parse(String(activeFragment.files)) as { [path: string]: string })
-    : null;
+  const fileCollection = parseFragmentFiles(activeFragment?.files);
 
   return (
     <div className="h-full flex flex-col ">

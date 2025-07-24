@@ -8,9 +8,10 @@ interface AutoSaveOptions {
 export class AutoSaveManager {
   private static instance: AutoSaveManager;
   private isEnabled: boolean = false;
+  private isInitialized: boolean = false;
 
   private constructor() {
-    this.initializeAutoSave();
+    // Constructor no longer calls async methods
   }
 
   public static getInstance(): AutoSaveManager {
@@ -20,37 +21,58 @@ export class AutoSaveManager {
     return AutoSaveManager.instance;
   }
 
-  private async initializeAutoSave(): Promise<void> {
+  /**
+   * Initialize the AutoSaveManager. This method must be called and awaited
+   * before any other usage of the manager to guarantee proper setup.
+   */
+  public async initialize(): Promise<void> {
+    if (this.isInitialized) {
+      return; // Already initialized
+    }
+
     try {
       const result = await chrome.storage.local.get(["auto_save_results"]);
       this.isEnabled = result.auto_save_results ?? false;
+      this.isInitialized = true;
       logger.info(`Auto-save initialized: ${this.isEnabled}`);
     } catch (error) {
       logger.error("Error initializing auto-save:", error);
+      throw error; // Re-throw to notify caller of initialization failure
+    }
+  }
+
+  /**
+   * Check if the manager has been properly initialized
+   */
+  private ensureInitialized(): void {
+    if (!this.isInitialized) {
+      throw new Error(
+        "AutoSaveManager must be initialized before use. Call initialize() first."
+      );
     }
   }
 
   public async setAutoSaveEnabled(enabled: boolean): Promise<void> {
-    this.isEnabled = enabled;
+    this.ensureInitialized();
+
     try {
       await chrome.storage.local.set({ auto_save_results: enabled });
+      this.isEnabled = enabled;
       logger.info(`Auto-save ${enabled ? "enabled" : "disabled"}`);
     } catch (error) {
       logger.error("Error setting auto-save state:", error);
+      throw error; // Re-throw to notify caller
     }
   }
 
-  public async isAutoSaveEnabled(): Promise<boolean> {
-    try {
-      const result = await chrome.storage.local.get(["auto_save_results"]);
-      return result.auto_save_results ?? false;
-    } catch (error) {
-      logger.error("Error checking auto-save state:", error);
-      return false;
-    }
+  public isAutoSaveEnabled(): boolean {
+    this.ensureInitialized();
+    return this.isEnabled;
   }
 
   public async triggerAutoSave(options: AutoSaveOptions): Promise<boolean> {
+    this.ensureInitialized();
+
     if (!this.isEnabled) {
       logger.info("Auto-save is disabled, skipping");
       return false;
@@ -76,10 +98,10 @@ export class AutoSaveManager {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           value: message,
-          token: authToken,
         }),
       });
 
@@ -124,6 +146,8 @@ export class AutoSaveManager {
   }
 
   public async storePendingCode(code: string): Promise<void> {
+    this.ensureInitialized();
+
     try {
       await chrome.storage.local.set({ pendingScrapedCode: code });
       logger.info("Pending scraped code stored");
@@ -133,6 +157,8 @@ export class AutoSaveManager {
   }
 
   public async getPendingCode(): Promise<string | null> {
+    this.ensureInitialized();
+
     try {
       const result = await chrome.storage.local.get(["pendingScrapedCode"]);
       return result.pendingScrapedCode || null;
@@ -143,6 +169,8 @@ export class AutoSaveManager {
   }
 
   public async clearPendingCode(): Promise<void> {
+    this.ensureInitialized();
+
     try {
       await chrome.storage.local.remove(["pendingScrapedCode"]);
       logger.info("Pending scraped code cleared");

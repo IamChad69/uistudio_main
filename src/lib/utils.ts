@@ -177,15 +177,15 @@ export function formatComponentForCopy(
 
   // Extract just the component function/JSX, removing page-level structure
   const lines = cleanedCode.split("\n");
-  const componentStartIndex = lines.findIndex(
-    (line) =>
-      line.includes("export default function") ||
-      (line.includes("function") && line.includes("(") && line.includes(")")) ||
-      (line.includes("const") &&
-        line.includes("=") &&
-        line.includes("(") &&
-        line.includes(")"))
-  );
+  const componentStartIndex = lines.findIndex((line) => {
+    const trimmed = line.trim();
+    return (
+      trimmed.startsWith("export default function") ||
+      trimmed.startsWith("export function") ||
+      /^export\s+default\s+const\s+\w+\s*=/.test(trimmed) ||
+      /^const\s+[A-Z]\w*\s*=\s*\(.*\)\s*=>/.test(trimmed)
+    );
+  });
 
   if (componentStartIndex !== -1) {
     const componentLines = lines.slice(componentStartIndex);
