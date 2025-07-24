@@ -215,25 +215,6 @@ export const WorkflowSettings: React.FC = () => {
               setCreateComponents(value);
             }}
           />
-
-          {/* Create as template Settings */}
-          <SettingItem
-            title="Create as template"
-            description={
-              isAuthenticated
-                ? "Add a component wrapper to your copied codes"
-                : "Upgrade to enable template creation"
-            }
-            isPremium={!isAuthenticated}
-            checked={isAuthenticated && createAsTemplate}
-            onChange={(value: boolean) => {
-              if (isAuthenticated) {
-                console.log("Setting createAsTemplate to:", value);
-                setCreateAsTemplate(value);
-              }
-            }}
-            disabled={!isAuthenticated}
-          />
         </div>
       </div>
     </div>

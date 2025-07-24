@@ -34,73 +34,114 @@ export class AssetExtractor {
       }
 
       .asset-extractor-content {
-        background-color: #1e1e1e;
+        background: linear-gradient(145deg, #0a0a0a 0%, #111111 100%);
         width: 240px;
         max-height: calc(100vh - 120px);
         color: white;
-        border-radius: 4px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 16px;
+        box-shadow: 
+          0 20px 25px -5px rgba(0, 0, 0, 0.4),
+          0 10px 10px -5px rgba(0, 0, 0, 0.2),
+          0 0 0 1px rgba(255, 255, 255, 0.05);
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .assets-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 8px 12px;
-        background-color: #222;
-        border-bottom: 1px solid #333;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       }
 
       .assets-header h2 {
-        font-size: 14px;
+        font-size: 16px;
         margin: 0;
-        font-weight: 500;
+        font-weight: 600;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+        background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
       .asset-close-button {
-        background: transparent;
-        color: white;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.7);
         border: none;
         cursor: pointer;
         font-size: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 20px;
-        height: 20px;
+        width: 28px;
+        height: 28px;
         padding: 0;
-        opacity: 0.7;
-        transition: opacity 0.2s;
+        border-radius: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .asset-close-button:hover {
-        opacity: 1;
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        transform: scale(1.05);
       }
 
       .asset-scroll-container {
         overflow: auto;
-        max-height: calc(400px - 37px);
+        max-height: calc(400px - 60px);
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+      }
+
+      .asset-scroll-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .asset-scroll-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .asset-scroll-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+      }
+
+      .asset-scroll-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
       }
 
       .asset-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-        padding: 8px;
+        gap: 8px;
+        padding: 16px;
       }
 
       .asset-item {
-        border-radius: 4px;
+        border-radius: 12px;
         overflow: hidden;
-        background-color: #333;
+        background: rgba(255, 255, 255, 0.05);
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         aspect-ratio: 1/1;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .asset-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
 
       .asset-preview {
@@ -125,27 +166,49 @@ export class AssetExtractor {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 30px;
-        height: 30px;
-        background-color: white;
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.95);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         opacity: 0;
-        transition: opacity 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
         z-index: 10;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 
+          0 4px 12px rgba(0, 0, 0, 0.3),
+          0 2px 4px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(8px);
+      }
+
+      .download-icon:hover {
+        background: #ffffff;
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 
+          0 6px 16px rgba(0, 0, 0, 0.4),
+          0 4px 8px rgba(0, 0, 0, 0.3);
       }
 
       .download-icon svg {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
       }
 
       .asset-item:hover .download-icon {
         opacity: 1;
+      }
+
+      @keyframes slideUp {
+        from { 
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+        }
+        to { 
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
     `;
   }
