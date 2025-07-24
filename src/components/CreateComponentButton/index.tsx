@@ -25,7 +25,7 @@ const CreateComponentButton = () => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="gap-2 bg-background/50 backdrop-blur-sm border-dashed hover:bg-accent/50 hover:border-solid transition-all duration-200"
+          className="gap-2 bg-background/50 backdrop-blur-sm border-border hover:bg-accent/50 hover:border-solid transition-all duration-200"
           onClick={() => setIsOpen(true)}
         >
           <PlusIcon className="h-4 w-4" />

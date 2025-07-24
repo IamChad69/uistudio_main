@@ -352,7 +352,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-8 min-h-0">
+    <div className="w-full flex flex-col gap-8 min-h-0 py-2">
       <PageHeader
         heading="Settings"
         description="Manage your account settings and billing"

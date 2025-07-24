@@ -13,12 +13,7 @@ import { Suspense, useState, useEffect } from "react";
 import { Fragment } from "@/generated/prisma";
 import ProjectHeader from "../components/project-Header";
 import FragmentWeb from "../components/fragment-web";
-import {
-  CodeIcon,
-  EyeIcon,
-  CopyCheckIcon,
-  CopyIcon,
-} from "lucide-react";
+import { CodeIcon, EyeIcon, CopyCheckIcon, CopyIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Hint from "@/components/hint";
 import { RefreshCcw, ArrowUpRight } from "lucide-react";
@@ -177,7 +172,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
                     size="sm"
                     onClick={handleCopyComponent}
                     disabled={copied || !activeFragment?.files}
-                    className="gap-2 text-muted-foreground"
+                    className="gap-2 "
                   >
                     {copied ? (
                       <>
@@ -199,7 +194,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
                     onClick={onRefresh}
                     disabled={!activeFragment?.sandboxUrl}
                   >
-                    <RefreshCcw size={16} className="text-muted-foreground" />
+                    <RefreshCcw size={16} />
                   </Button>
                 </Hint>
 
@@ -214,7 +209,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
                       window.open(activeFragment.sandboxUrl, "_blank");
                     }}
                   >
-                    <ArrowUpRight size={16} className="text-muted-foreground" />
+                    <ArrowUpRight size={16} />
                   </Button>
                 </Hint>
               </div>
