@@ -13,12 +13,17 @@ import { Suspense, useState, useEffect } from "react";
 import { Fragment } from "@/generated/prisma";
 import ProjectHeader from "../components/project-Header";
 import FragmentWeb from "../components/fragment-web";
-import { CodeIcon, EyeIcon, Copy, Check } from "lucide-react";
+import {
+  CodeIcon,
+  EyeIcon,
+  CopyCheckIcon,
+  CopyIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Hint from "@/components/hint";
-import { RefreshCcw, ExternalLink } from "lucide-react";
+import { RefreshCcw, ArrowUpRight } from "lucide-react";
 import FileExplorer from "@/components/file-explorer";
-import { extractMainComponent, formatComponentForCopy } from "@/lib/utils";
+import { extractMainComponent } from "@/lib/utils";
 import { toast } from "sonner";
 
 import { ErrorBoundary } from "react-error-boundary";
@@ -147,18 +152,18 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
           className="flex flex-col border border-border rounded-md"
         >
           <Tabs
-            className="h-full flex flex-col"
+            className="h-full flex bg-transparent flex-col"
             value={tabState}
             defaultValue="preview"
             onValueChange={(value) => setTabState(value as "preview" | "code")}
           >
             <div className="w-full flex items-center p-2 border-b gap-x-2">
-              <TabsList className="h-8 p-0 border rounded-full">
-                <TabsTrigger value="preview" className="rounded-full">
+              <TabsList className="h-8 p-0  rounded-md">
+                <TabsTrigger value="preview" className="rounded-md">
                   <EyeIcon />
                   <span>Demo</span>
                 </TabsTrigger>
-                <TabsTrigger value="code" className="rounded-full">
+                <TabsTrigger value="code" className="rounded-md">
                   <CodeIcon />
                   <span>Code</span>
                 </TabsTrigger>
@@ -168,21 +173,19 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
                 {/* Copy Component Button */}
                 <Hint text="Copy component code" side="bottom" align="start">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={handleCopyComponent}
                     disabled={copied || !activeFragment?.files}
-                    className="gap-2"
+                    className="gap-2 text-muted-foreground"
                   >
                     {copied ? (
                       <>
-                        <Check className="w-4 h-4" />
-                        Copied
+                        <CopyCheckIcon className="w-4 h-4 text-green-500" />
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4" />
-                        Copy Component
+                        <CopyIcon className="w-4 h-4 " />
                       </>
                     )}
                   </Button>
@@ -211,7 +214,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
                       window.open(activeFragment.sandboxUrl, "_blank");
                     }}
                   >
-                    <ExternalLink size={16} className="text-muted-foreground" />
+                    <ArrowUpRight size={16} className="text-muted-foreground" />
                   </Button>
                 </Hint>
               </div>
