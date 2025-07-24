@@ -18,7 +18,7 @@ import { ThemeSwitcher } from "./theme-swticher";
 
 const Sidebar = () => {
   const pathname = usePathname;
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Only show theme UI after mounting to prevent hydration mismatch
@@ -76,7 +76,7 @@ const Sidebar = () => {
 
         {/* Theme switcher */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <ThemeSwitcher /> 
+          <ThemeSwitcher />
           <HelpCircle className="w-4 h-4" />
         </div>
       </div>

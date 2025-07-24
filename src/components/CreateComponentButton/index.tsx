@@ -10,8 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
-import ProjectForm from "@/app/(publicRoutes)/ui/project-form";
-
+import ProjectForm from "@/app/(publicRoutes)/home/project-form";
 
 const CreateComponentButton = () => {
   const [isOpen, setIsOpen] = useState(false);

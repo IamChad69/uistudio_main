@@ -1,4 +1,4 @@
-import { Navbar } from "./ui/navbar";
+import { StackedCircularFooter } from "@/components/ui/stacked-circular-footer";
 
 interface HomeLayoutProps {
   children: React.ReactNode;
@@ -7,8 +7,8 @@ interface HomeLayoutProps {
 const HomeLayout = ({ children }: HomeLayoutProps) => {
   return (
     <main className="flex flex-col min-h-screen">
-      <Navbar />
       <div className="flex flex-1 flex-col px-4 pb-4">{children}</div>
+      <StackedCircularFooter />
     </main>
   );
 };
