@@ -39,8 +39,8 @@ import {
   PanelLeft,
   PanelLeftClose,
   Clock,
+  DownloadIcon,
 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -57,7 +57,6 @@ const ProjectHeader = ({ projectId }: ProjectHeaderProps) => {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const { data: project } = useSuspenseQuery(
     trpc.projects.getOne.queryOptions({ id: projectId })
@@ -147,50 +146,15 @@ const ProjectHeader = ({ projectId }: ProjectHeaderProps) => {
     toast.success(`Loaded version: ${fragment.title}`);
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-
-    // Toggle sidebar visibility by adding a class to the body or a parent element
-    document.body.classList.toggle("sidebar-closed", !isSidebarOpen);
-
-    // Dispatch a custom event that other components can listen for
-    const event = new CustomEvent("toggle-sidebar", {
-      detail: { isOpen: !isSidebarOpen },
-    });
-    document.dispatchEvent(event);
-  };
-
-  // Initialize sidebar state based on localStorage if available
-  useEffect(() => {
-    const savedState = localStorage.getItem("sidebar-state");
-    if (savedState) {
-      const isOpen = savedState === "open";
-      setIsSidebarOpen(isOpen);
-      document.body.classList.toggle("sidebar-closed", !isOpen);
-    }
-  }, []);
-
-  // Save sidebar state to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem("sidebar-state", isSidebarOpen ? "open" : "closed");
-  }, [isSidebarOpen]);
-
   return (
-    <header className="sticky top-0 z-10 px-4 py-1.5 border-b border-border">
+    <header className="sticky top-0 z-10 px-4 py-2 border-b border-border">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
-        {/* Left section - Sidebar toggle, project icon and name */}
-        <div className="flex items-center gap-3">
+        {/* Left section - Sidebar toggle and project name */}
+        <div className="flex items-center ">
+          {/* Project name and edit functionality */}
           <div className="flex items-center gap-2">
-            <Image
-              src="/react.svg"
-              alt="Project icon"
-              width={20}
-              height={20}
-              className="flex-shrink-0"
-            />
-
             {isEditing ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center ">
                 <Input
                   value={editedName}
                   onChange={(e) => setEditedName(e.target.value)}
@@ -228,83 +192,93 @@ const ProjectHeader = ({ projectId }: ProjectHeaderProps) => {
                 </Button>
               </div>
             ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="hover:bg-gray-100 transition-colors px-2 py-1 h-auto flex items-center gap-1"
-                  >
-                    <span className="text-sm font-medium">{project.name}</span>
-                    <ChevronDown className="size-3 ml-1" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  <DropdownMenuItem onClick={handleEditStart}>
-                    <Edit3 className="size-4 mr-2" />
-                    Rename Project
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDuplicateProject}>
-                    <Copy className="size-4 mr-2" />
-                    Duplicate Project
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleShareProject}
-                    className="sm:hidden"
-                  >
-                    <Share className="size-4 mr-2" />
-                    Share Project
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem
-                        onSelect={(e) => e.preventDefault()}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <Trash2Icon className="size-4 mr-2 text-destructive" />
-                        Delete Project
-                      </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Project</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete "{project.name}"? This
-                          action cannot be undone and will permanently remove
-                          all project data.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDeleteProject}
-                          disabled={deleteProjectMutation.isPending}
-                          className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-                        >
-                          {deleteProjectMutation.isPending ? (
-                            <>
-                              <Loader2 className="size-4 mr-2 animate-spin" />
-                              Deleting...
-                            </>
-                          ) : (
-                            <>
-                              <Trash2Icon className="size-4 mr-2" />
-                              Delete Project
-                            </>
-                          )}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium truncate ">
+                  {project.name}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleEditStart}
+                  className="h-6 w-6 p-0 hover:bg-gray-100"
+                >
+                  <Edit3 className="size-3" />
+                </Button>
+              </div>
             )}
           </div>
         </div>
 
         {/* Right section - Actions */}
         <div className="flex items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hover:bg-gray-100 transition-colors px-2 py-1 h-auto flex items-center gap-1"
+              >
+                <span className="text-sm font-medium">Actions</span>
+                <ChevronDown className="size-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={handleDuplicateProject}>
+                <DownloadIcon className="size-4 mr-2" />
+                Export Project
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleShareProject}
+                className="sm:hidden"
+              >
+                <Share className="size-4 mr-2" />
+                Share Project
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2Icon className="size-4 mr-2 text-destructive" />
+                    Delete Project
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Project</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete "{project.name}"? This
+                      action cannot be undone and will permanently remove all
+                      project data.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteProject}
+                      disabled={deleteProjectMutation.isPending}
+                      className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                    >
+                      {deleteProjectMutation.isPending ? (
+                        <>
+                          <Loader2 className="size-4 mr-2 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2Icon className="size-4 mr-2" />
+                          Delete Project
+                        </>
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-1">
@@ -349,19 +323,6 @@ const ProjectHeader = ({ projectId }: ProjectHeaderProps) => {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="mr-1"
-            title={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-          >
-            {isSidebarOpen ? (
-              <PanelLeft className="size-4" />
-            ) : (
-              <PanelLeftClose className="size-4" />
-            )}
-          </Button>
         </div>
       </div>
     </header>

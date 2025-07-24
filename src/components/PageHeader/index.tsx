@@ -10,7 +10,7 @@ type Props = {
 
 const PageHeader = ({ heading, description, children, placeholder }: Props) => {
   return (
-    <div className="w-full flex flex-col gap-8">
+    <div className="w-full flex flex-col gap-8 py-1.5">
       <div className="w-full flex justify-start sm:justify-between items-center gap-8 flex-wrap">
         <div className="flex flex-col gap-2">
           <p className="text-primary text-4xl font-semibold">{heading}</p>

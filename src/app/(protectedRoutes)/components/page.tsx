@@ -15,7 +15,7 @@ const ComponentsPage = () => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-8 min-h-0">
+    <div className="w-full flex flex-col gap-8 min-h-0 py-2">
       <PageHeader
         heading="Browse all"
         description="View and manage your saved components"
