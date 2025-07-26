@@ -153,7 +153,7 @@ const ProjectViews = ({ projectId, data }: ProjectViewsProps) => {
             onValueChange={(value) => setTabState(value as "preview" | "code")}
           >
             <div className="w-full flex items-center p-2 border-b gap-x-2">
-              <TabsList className="h-8 p-0  rounded-md">
+              <TabsList className="h-8 p-0 border border-border rounded-md">
                 <TabsTrigger value="preview" className="rounded-md">
                   <EyeIcon />
                   <span>Demo</span>

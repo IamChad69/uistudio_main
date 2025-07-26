@@ -137,7 +137,7 @@ const FileExplorer = ({ files }: FileExplorerProps) => {
               <FileBreadcrumb filePath={selectedFile} />
               <Hint text="Copy to Clipboard" side="bottom">
                 <Button
-                  variant={"outline"}
+                  variant={"ghost"}
                   size={"icon"}
                   className="ml-auto"
                   disabled={isCopied}
