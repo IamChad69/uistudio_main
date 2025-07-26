@@ -11,7 +11,7 @@ import { AssetExtractor } from "../actions/AssetExtractor";
 
 class ContentScript {
   private scraper!: UIScraper;
-  // FontInspector is now managed by the FontInspectorUI React component
+// FontInspector is now managed by the FontInspectorUI React component
   private assetExtractor!: AssetExtractor;
   private isColorPickerActive: boolean = false;
   private reactRoot: ReactDOMClient.Root | null = null;

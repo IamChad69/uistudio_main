@@ -522,7 +522,7 @@ function FloatingButton({
                       onMouseOut={(e) =>
                         handleButtonHover(e.currentTarget, false)
                       }
-                      //onClick={handleColorPicker}
+                      onClick={onStartColorPicker}
                       onFocus={(e) => handleButtonHover(e.currentTarget, true)}
                       onBlur={(e) => handleButtonHover(e.currentTarget, false)}
                     >
