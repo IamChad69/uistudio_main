@@ -739,7 +739,11 @@ function FloatingButton({
                 >
                   <div style={spacedItemStyle}>
                     <button
-                      style={styles.iconButton}
+                      style={{
+                        ...styles.iconButton,
+                        cursor: isAuthenticated ? "default" : "pointer",
+                        opacity: isAuthenticated ? 0.8 : 1,
+                      }}
                       aria-label={
                         isAuthenticated
                           ? isPro
@@ -747,15 +751,20 @@ function FloatingButton({
                             : "Premium User"
                           : "Sign In"
                       }
-                      onClick={handleAuthClick}
+                      onClick={isAuthenticated ? undefined : handleAuthClick}
+                      disabled={isAuthenticated}
                       onMouseOver={(e) =>
-                        handleButtonHover(e.currentTarget, true)
+                        !isAuthenticated && handleButtonHover(e.currentTarget, true)
                       }
                       onMouseOut={(e) =>
-                        handleButtonHover(e.currentTarget, false)
+                        !isAuthenticated && handleButtonHover(e.currentTarget, false)
                       }
-                      onFocus={(e) => handleButtonHover(e.currentTarget, true)}
-                      onBlur={(e) => handleButtonHover(e.currentTarget, false)}
+                      onFocus={(e) =>
+                        !isAuthenticated && handleButtonHover(e.currentTarget, true)
+                      }
+                      onBlur={(e) =>
+                        !isAuthenticated && handleButtonHover(e.currentTarget, false)
+                      }
                     >
                       {isAuthenticated ? (
                         <Crown size={18} />

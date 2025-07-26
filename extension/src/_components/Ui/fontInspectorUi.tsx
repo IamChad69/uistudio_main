@@ -5,8 +5,9 @@ import { FontInfo } from "../../types"; // Assuming interfaces.ts and fontInspec
 import {
   FontInspector,
   copyToClipboard,
-  generateCssProperties,
+  generateCodeSnippet,
 } from "../../actions/FontInspector"; // Import the core logic
+import { convertToTailwind } from "../../utils/tailwindConverter"; // Import the existing Tailwind converter
 
 // Constants (can be moved to a shared constants file if needed)
 const FONT_INFO_TOOLTIP_ID = "uiscraper-font-tooltip";
@@ -551,15 +552,32 @@ export const FontInspectorUI: React.FC<FontInspectorUIProps> = ({
     }
   }, [isActive]);
 
-  const handleCopyAllCss = (info: FontInfo) => {
-    copyToClipboard(generateCssProperties(info)).then((success) => {
+  const handleCopyAllCss = async (info: FontInfo) => {
+    try {
+      // Try to get preferred framework from storage
+      let outputType: "tailwind-jsx" | "css" = "css";
+      
+      try {
+        const preferredFramework = await FontInspector.getPreferredFramework();
+        if (preferredFramework === "react") {
+          outputType = "tailwind-jsx";
+        }
+      } catch (error) {
+        console.warn("Could not get preferred framework, defaulting to CSS:", error);
+      }
+
+      const codeSnippet = generateCodeSnippet(info, outputType);
+      
+      const success = await copyToClipboard(codeSnippet);
       if (success) {
         setShowCopySuccessMessage(true);
         setTimeout(() => {
           inspectorRef.current?.stopInspection(); // Deactivate inspector
         }, 800);
       }
-    });
+    } catch (error) {
+      console.error("Error copying code snippet:", error);
+    }
   };
 
   // Don't render anything when not active - let FloatingButton handle activation
