@@ -556,18 +556,21 @@ export const FontInspectorUI: React.FC<FontInspectorUIProps> = ({
     try {
       // Try to get preferred framework from storage
       let outputType: "tailwind-jsx" | "css" = "css";
-      
+
       try {
         const preferredFramework = await FontInspector.getPreferredFramework();
         if (preferredFramework === "react") {
           outputType = "tailwind-jsx";
         }
       } catch (error) {
-        console.warn("Could not get preferred framework, defaulting to CSS:", error);
+        console.warn(
+          "Could not get preferred framework, defaulting to CSS:",
+          error
+        );
       }
 
       const codeSnippet = generateCodeSnippet(info, outputType);
-      
+
       const success = await copyToClipboard(codeSnippet);
       if (success) {
         setShowCopySuccessMessage(true);

@@ -8,7 +8,7 @@ type Props = {
   children: ReactNode;
 };
 
-const Layout = async ({ children }: Props) => {
+const Layout = ({ children }: Props) => {
   return (
     <div className="flex w-full h-screen">
       <Sidebar />

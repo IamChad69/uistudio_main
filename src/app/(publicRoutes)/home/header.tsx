@@ -17,7 +17,13 @@ const menuItems = [
 export const Header = () => {
   const [menuState, setMenuState] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-   const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -25,6 +31,12 @@ export const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Determine the correct logo source
+  const logoSrc =
+    mounted && (resolvedTheme === "dark" || theme === "dark")
+      ? "/UiScraperLogo-light.png"
+      : "/UiScraperLogo-dark.png";
 
   return (
     <header>
@@ -34,9 +46,9 @@ export const Header = () => {
       >
         <div
           className={cn(
-            "mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12",
+            "mx-auto mt-2 max-w-7xl px-6 transition-all duration-300 lg:px-12",
             isScrolled &&
-              "bg-background/50 max-w-4xl rounded-2xl border backdrop-blur-lg lg:px-5"
+              "bg-background/50 max-w-7xl rounded-2xl border backdrop-blur-lg lg:px-5"
           )}
         >
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
@@ -47,11 +59,7 @@ export const Header = () => {
                 className="flex items-center space-x-2"
               >
                 <Image
-                  src={
-                    theme === "dark"
-                      ? "/UiScraperLogo-light.png"
-                      : "/UiScraperLogo-dark.png"
-                  }
+                  src={logoSrc}
                   alt="logo"
                   width={24}
                   height={24}
