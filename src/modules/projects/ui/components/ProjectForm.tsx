@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { PROJECT_TEMPLATES } from "../constants";
+
 import { useClerk } from "@clerk/nextjs";
 
 const formSchema = z.object({
@@ -137,19 +137,6 @@ const ProjectForm = ({ onSubmit: onSubmitCallback }: ProjectFormProps) => {
             </Button>
           </div>
         </form>
-        {/* <div className="flex-wrap justify-center gap-2 hidden md:flex max-w-3xl">
-          {PROJECT_TEMPLATES.map((template) => (
-            <Button
-              key={template.title}
-              variant="outline"
-              size="sm"
-              className="bg-white dark:bg-sidebar"
-              onClick={() => onSelect(template.prompt)}
-            >
-              {template.emoji} {template.title}
-            </Button>
-          ))}
-        </div> */}
       </Form>
     </section>
   );

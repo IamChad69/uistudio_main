@@ -3,7 +3,7 @@
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import ComponentCard from "@/modules/projects/ui/components/component-card";
-import { useState, useMemo, Suspense, useCallback, useEffect } from "react"; // Added useEffect
+import { useState, useMemo, useCallback, useEffect } from "react"; // Added useEffect
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import FragmentWeb from "@/modules/projects/ui/components/fragment-web";
 import { Fragment } from "@/generated/prisma";
