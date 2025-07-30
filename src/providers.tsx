@@ -3,8 +3,9 @@
 import { TRPCReactProvider } from "@/trpc/client";
 import { Toaster } from "./components/ui/sonner";
 import { ThemeProvider } from "./components/ui/ThemeProvider";
+import { ReactNode } from "react";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <TRPCReactProvider>
       <ThemeProvider

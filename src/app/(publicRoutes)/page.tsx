@@ -1,11 +1,18 @@
 import React from "react";
 import SectionWithMockup from "./home/Context";
-import { Header } from "./home/Header";
 import { Metadata } from "next";
 import { BasicLayout } from "@/components/Layouts/LandingLayout/LandingLayout";
 import { Features } from "./home/FeatureGrid";
 import PricingSection from "./home/PricingSection";
-import { Hero } from "./home/HeroSections";
+import { HeroSection } from "./home/HeroSections";
+import { FAQSection } from "./home/FAQSection";
+import { Header } from "./home/NavBar";
+import AppFeatures from "./home/AppFeatures";
+import ComponentLibrary from "./home/ComponentLibrary";
+import FeatureSection from "./home/FeatureSection";
+import UiSandbox from "./home/UiSandbox.tsx";
+import { BrowserStores } from "./home/Webstores";
+import { Browser } from "./home/Browser";
 
 export const metadata: Metadata = {
   title: "UiScraper",
@@ -24,13 +31,19 @@ const exampleData1 = {
 export default function HomePage() {
   return (
     <BasicLayout>
+      {" "}
       <Header />
       <div className="min-h-screen mx-auto max-w-7xl px-2 lg:px-12">
-        <Hero />
+        <HeroSection />
         <SectionWithMockup />
-
+        <FeatureSection />
+        <UiSandbox />
+        <ComponentLibrary />
+        <Browser />
+        <AppFeatures />
         <Features />
         <PricingSection />
+        <FAQSection />
       </div>
     </BasicLayout>
   );
