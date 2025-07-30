@@ -11,6 +11,7 @@ import {
   HIDE_EXTENSION_ACTION,
   EXTENSION_UI_CLOSED_ACTION,
   EXTENSION_UI_SHOWN_ACTION,
+  DOWNLOAD_ASSET_ACTION,
 } from "../constants/messages";
 
 import {
@@ -81,12 +82,12 @@ browser.runtime.onInstalled.addListener((): void => {
     title: "Color Picker",
     contexts: ["page", "selection", "image", "link"],
   });
-  // Download Asset or screenshot of the highlighted area
-   browser.contextMenus.create({
-     id: DOWNLOAD_ASSET_MENU_ID,
-     title: "Download Asset",
-     contexts: ["page", "selection", "image", "link"],
-   });
+
+  browser.contextMenus.create({
+    id: DOWNLOAD_ASSET_MENU_ID,
+    title: "Download Asset",
+    contexts: ["page", "selection", "image", "link"],
+  });
 });
 
 // Listen for context menu clicks
@@ -107,6 +108,11 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
       await browser.tabs.sendMessage(tab.id, {
         action: TOGGLE_COLOR_PICKER_ACTION,
         command: "start", // Explicitly start the picker
+      });
+    } else if (info.menuItemId === DOWNLOAD_ASSET_MENU_ID) {
+      console.log("[uiScraper] Download asset requested via context menu");
+      await browser.tabs.sendMessage(tab.id, {
+        action: DOWNLOAD_ASSET_ACTION,
       });
     }
   } catch (error) {
