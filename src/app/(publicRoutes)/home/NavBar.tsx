@@ -32,23 +32,17 @@ export const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Determine the correct logo source
-  const logoSrc =
-    mounted && (resolvedTheme === "dark" || theme === "dark")
-      ? "/UiScraperLogo-light.png"
-      : "/UiScraperLogo-dark.png";
-
   return (
     <header>
       <nav
         data-state={menuState && "active"}
-        className="fixed group z-20 w-full px-2"
+        className="fixed group z-20 w-full"
       >
         <div
           className={cn(
-            "mx-auto mt-2 max-w-7xl px-6 transition-all duration-300 lg:px-12",
+            "mx-auto mt-2 max-w-7xl px-2 lg:px-12 transition-all duration-300",
             isScrolled &&
-              "bg-background/50 max-w-7xl rounded-2xl border backdrop-blur-lg lg:px-5"
+              "bg-background/50 max-w-4xl rounded-2xl border backdrop-blur-lg"
           )}
         >
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
@@ -59,7 +53,7 @@ export const Header = () => {
                 className="flex items-center space-x-2"
               >
                 <Image
-                  src={logoSrc}
+                  src={"/UiScraperLogo-dark.png"}
                   alt="logo"
                   width={24}
                   height={24}

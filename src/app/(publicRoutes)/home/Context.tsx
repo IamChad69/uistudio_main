@@ -4,6 +4,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { VideoPlayer } from "@/components/VideoPlayer/VideoPlayer";
 
 interface SectionWithMockupProps {}
 
@@ -12,7 +13,7 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
     <section>
       {/* Heading Section */}
       <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold  mb-6">
+        <h2 className="font-aeonik font-medium text-center leading-tight text-3xl sm:text-4xl md:text-4xl lg:text-5xl">
           AI that understands what you see
         </h2>
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -32,7 +33,7 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
               </span>
               <h2 className="text-4xl md:text-5xl font-bold ">
                 Your context aware{" "}
-                <span className="text-blue-400">Assistant</span>
+                <span className="text-muted-foreground">Assistant</span>
               </h2>
               <p className="text-lg text-muted-foreground max-w-md">
                 Our extension works with every app site on your computer with no
@@ -42,9 +43,7 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
             <div className=" border border-border border-light-10  rounded-full p-2 gap-2 group">
               <Link href="/" className="flex items-center gap-2">
                 {" "}
-                <span className="text-sm hidden sm:block  px-2">
-                  Add to Chrome
-                </span>
+                <span className="text-sm k  px-2">Add to Chrome</span>
                 <Image
                   src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg"
                   alt="Chrome"
@@ -57,14 +56,8 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
           </div>
 
           {/* Right Column - Video Demo */}
-          <div className="bg-muted  overflow-hidden h-full shadow-lg">
-            <video
-              autoPlay={true}
-              loop={true}
-              muted={true}
-              className="w-full h-full object-cover opacity-80 dark:opacity-90"
-              src="https://myhhjl9xib.ufs.sh/f/ueACguBO3qEXuuKXk5BO3qEX8zmS5D6YGluptwTFgoeNhHbK"
-            />
+          <div className="bg-muted  overflow-hidden h-full shadow-lg rounded-b-3xl">
+            <VideoPlayer src="https://myhhjl9xib.ufs.sh/f/ueACguBO3qEXuuKXk5BO3qEX8zmS5D6YGluptwTFgoeNhHbK" />
           </div>
         </div>
       </div>

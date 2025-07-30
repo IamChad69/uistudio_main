@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { LogoCloud } from "./LogoCloud";
 import Image from "next/image";
 import { Hero7 } from "./SocialProof";
+import { VideoPlayer } from "@/components/VideoPlayer/VideoPlayer";
 
 const demoData = {
   heading: "A Collection of Components Built With Shadcn & Tailwind",
@@ -41,11 +42,11 @@ const demoData = {
   },
 };
 
-function Hero() {
+function HeroSection() {
   return (
-    <div className="w-full max-w-7xl mx-auto py-10 lg:py-18">
+    <div className="w-full max-w-7xl mx-auto   flex flex-col justify-center relative h-full min-h-[90vh] sm:pb-[160px] sm:h-full py-20">
       <div className="container mx-auto mt-10">
-        <div className="grid grid-cols-1 gap-6 items-center lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 items-center lg:grid-cols-2  leading-loose text-left">
           <div className="flex gap-6 flex-col">
             <div>
               <Badge variant="outline">We&apos;re live!</Badge>
@@ -65,40 +66,31 @@ function Hero() {
                 Start Building
                 <MoveRight className="w-4 h-4" />
               </Button>
-              <div className="flex items-center gap-2 group ml-3">
-                <span className="text-sm hidden sm:block text-gray-400 mr-3">
-                  Available on
+
+              <Link
+                href="/"
+                className="flex items-center gap-2 border border-border border-light-10 p-0.5   rounded-md hover:bg-accent  group"
+              >
+                {" "}
+                <span className="text-sm px-2 text-muted-foreground ">
+                  Add to Chrome
                 </span>
-                <Link href="/">
-                  <Image
-                    src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg"
-                    alt="Firefox"
-                    width={38}
-                    height={38}
-                    className="p-1 rounded-full hover:bg-zinc-950/5 dark:hover:bg-white/5 transition-colors duration-200"
-                  />
-                </Link>
-                <span className="text-gray-400 px-2">+</span>
-                <Link href="/">
-                  <Image
-                    src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg"
-                    alt="Chrome"
-                    width={38}
-                    height={38}
-                    className="p-1 rounded-full hover:bg-zinc-950/5 dark:hover:bg-white/5 transition-colors duration-200"
-                  />
-                </Link>
-              </div>
+                <Image
+                  src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg"
+                  alt="Chrome"
+                  width={38}
+                  height={38}
+                  className="p-1 rounded-full hover:bg-zinc-950/5 dark:hover:bg-white/5 transition-colors duration-200"
+                />
+              </Link>
             </div>
             <div className="mt-10">
               <Hero7 {...demoData} />
             </div>
           </div>
-          <div className="bg-muted rounded-md aspect-video w-full h-full">
-            <video
-              autoPlay={true}
-              loop={true}
-              className="w-full h-full object-cover rounded-lg opacity-50 invert dark:opacity-35 dark:invert-0 dark:lg:opacity-80"
+          <div className="bg-muted aspect-video w-full h-full rounded-3xl">
+            <VideoPlayer
+              className="rounded-3xl"
               src="https://myhhjl9xib.ufs.sh/f/ueACguBO3qEXuuKXk5BO3qEX8zmS5D6YGluptwTFgoeNhHbK"
             />
           </div>
@@ -109,4 +101,4 @@ function Hero() {
   );
 }
 
-export { Hero };
+export { HeroSection };

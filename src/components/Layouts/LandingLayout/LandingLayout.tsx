@@ -1,9 +1,10 @@
-import { Header } from "@/app/(publicRoutes)/home/Header";
+import { Header } from "@/app/(publicRoutes)/home/NavBar";
 import { StackedCircularFooter } from "@/components/ui/stacked-circular-footer";
 export function BasicLayout(props: { children: React.ReactNode }) {
   return (
     <div>
-      <main className="isolate min-h-screen">{props.children}</main>
+      {/* <Header /> */}
+      <main className="w-full">{props.children}</main>
       <StackedCircularFooter />
     </div>
   );
