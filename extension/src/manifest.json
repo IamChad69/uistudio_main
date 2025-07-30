@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "uiScraper_saas",
+  "name": "uiScraper",
   "version": "1.0.0",
 
   "icons": {
@@ -100,6 +100,16 @@
         "chromeos": "Alt+P"
       },
       "description": "Start color picker mode"
+    },
+    "start-download-asset": {
+      "suggested_key": {
+        "default": "Alt+D",
+        "mac": "Alt+D",
+        "windows": "Alt+D",
+        "linux": "Alt+D",
+        "chromeos": "Alt+D"
+      },
+      "description": "Start download asset mode"
     }
   }
 }
