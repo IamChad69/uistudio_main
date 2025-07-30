@@ -16,6 +16,7 @@ import {
 import {
   INSPECT_FONT_MENU_ID,
   COLOR_PICKER_MENU_ID,
+  DOWNLOAD_ASSET_MENU_ID,
 } from "../constants/menuItems";
 import {
   TOGGLE_SCRAPING_COMMAND,
@@ -71,15 +72,21 @@ browser.runtime.onInstalled.addListener((): void => {
   // Create context menu items
   browser.contextMenus.create({
     id: INSPECT_FONT_MENU_ID,
-    title: "Inspect Font and Styles",
+    title: "Font Inspector",
     contexts: ["page", "selection", "image", "link"],
   });
 
   browser.contextMenus.create({
     id: COLOR_PICKER_MENU_ID,
-    title: "Pick Color",
+    title: "Color Picker",
     contexts: ["page", "selection", "image", "link"],
   });
+  // Download Asset or screenshot of the highlighted area
+   browser.contextMenus.create({
+     id: DOWNLOAD_ASSET_MENU_ID,
+     title: "Download Asset",
+     contexts: ["page", "selection", "image", "link"],
+   });
 });
 
 // Listen for context menu clicks

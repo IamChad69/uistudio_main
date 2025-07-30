@@ -31,17 +31,17 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ feature, index }) => {
   const isImageOnLeft = finalImagePosition === "left";
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-px  overflow-hidden">
+    <div className="-mt-[1px] grid grid-cols-1 md:grid-cols-2 items-center ">
       {/* Content Section */}
       <div
-        className={`p-8 md:p-12  flex flex-col justify-center ${
+        className={`p-8 md:p-12 gap-4 flex flex-col justify-center ${
           isImageOnLeft ? "lg:order-2" : "lg:order-1"
         }`}
       >
         <h2 className="font-aeonik font-medium text-[36px] leading-[40px] ">
           {feature.title}
         </h2>
-        <p className="font-aeonik font-normal text-[16px] leading-[24px] text-muted-foreground ">
+        <p className="font-aeonik font-normal text-[16px] leading-[24px] text-white/60">
           {feature.description}
         </p>
       </div>
@@ -67,7 +67,7 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ feature, index }) => {
             alt={feature.imageAlt || feature.title}
             width={600}
             height={400}
-            className="w-full h-full  object-cover opacity-80 dark:opacity-90"
+            className="w-full h-full object-cover opacity-80 dark:opacity-90"
           />
         )}
       </div>
@@ -98,7 +98,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({}) => {
   const features: Feature[] = [
     {
       id: "Assets",
-      title: "Grab all website assets in seconds — icons, images, SVGs & more.",
+      title: "Download website assets in seconds ",
       description:
         "Extract deeply embedded assets like background images and icons without digging through source code. Perfect for redesigns, UI inspiration, and reuse across projects. One click to download, tag, and save.",
       imageUrl: "/zoom.png",
@@ -126,10 +126,10 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({}) => {
     <section className=" py-16">
       {/* Heading Section */}
       <div className="text-center mb-16">
-        <h2 className="font-medium text-center leading-tight text-3xl sm:text-4xl md:text-4xl lg:text-5xl">
+        <h2 className="font-medium text-center whitespace-pre-wrap text-[36px] leading-[40px]  bg-transparent mb-14 lg:text-[48px]">
           Discover Dev Tools
         </h2>
-        <p className="mt-8 font-normal text-md sm:text-lg lg:text-xl whitespace-pre-line text-muted-foreground max-w-3xl mx-auto px-4">
+        <p className="mt-8 font-normal text-md sm:text-lg lg:text-xl whitespace-pre-line text-white/60 max-w-3xl mx-auto px-4">
           Use UiScraper with powerful dev tools—crafted to streamline your
           workflow.
         </p>
