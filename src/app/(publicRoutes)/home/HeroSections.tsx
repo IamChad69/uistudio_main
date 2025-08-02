@@ -45,7 +45,7 @@ const demoData = {
 function HeroSection() {
   return (
     <div className="w-full max-w-7xl mx-auto   flex flex-col justify-center relative h-full min-h-[90vh] sm:pb-[160px] sm:h-full py-20">
-      <div className="container mx-auto mt-10">
+      <div className="container mx-auto mt-8">
         <div className="grid grid-cols-1 gap-6 items-center lg:grid-cols-2  leading-loose text-left">
           <div className="flex gap-6 flex-col">
             <div>
@@ -53,7 +53,7 @@ function HeroSection() {
             </div>
             <div className="flex gap-4 flex-col">
               <h1 className="text-5xl md:text-7xl max-w-lg tracking-tighter text-left font-regular">
-                Context aware code extraction & generation
+                Context aware React-code extraction & Generative AI
               </h1>
               <p className="text-xl leading-relaxed tracking-tight text-muted-foreground max-w-md text-left">
                 Extract and generate beautiful, accessible React + Tailwind CSS

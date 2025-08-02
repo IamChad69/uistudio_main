@@ -12,16 +12,17 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
   return (
     <section>
       {/* Heading Section */}
-      <div className="text-center mb-16">
-        <h2 className="font-aeonik font-medium text-center leading-tight text-3xl sm:text-4xl md:text-4xl lg:text-5xl">
+      <div className="relative z-10 mx-auto max-w-xl mb-16 space-y-4 text-center md:space-y-8">
+        <h2 className="text-balance text-4xl font-medium lg:text-5xl">
           AI that understands what you see
         </h2>
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-white/60">
           Highlight any element directly from a webpage to instantly extract its
-          HTML and CSS. Our smart extraction tool ensures clean, accurate code
-          extraction every time.
+          HTML and CSS. Our smart extraction tool ensures clean, production ready
+          code extraction every time.
         </p>
       </div>
+
       <div className="flex flex-col lg:flex-row h-full bg-light-5 border border-border border-light-10 rounded-2xl overflow-hidden">
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">

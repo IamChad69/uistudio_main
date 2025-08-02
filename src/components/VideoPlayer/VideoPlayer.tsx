@@ -139,7 +139,7 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
         loop
         muted
         playsInline
-        className="h-full w-full object-cover "
+        className="h-full w-full object-cover"
         src={src}
         onClick={togglePlay}
         onTimeUpdate={handleTimeUpdate}
@@ -152,13 +152,13 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
         {showControls && (
           <motion.div
             animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-            className="absolute inset-x-0 bottom-0 m-2 mx-auto max-w-xl rounded-2xl bg-[#11111198] p-4 backdrop-blur-md"
+            className="absolute inset-x-0 bottom-0 m-4 mx-auto max-w-2xl rounded-2xl bg-black/80 p-6 backdrop-blur-md border border-gray-800"
             exit={{ y: 20, opacity: 0, filter: "blur(10px)" }}
             initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
             transition={{ duration: 0.6, ease: "circInOut", type: "spring" }}
           >
-            <div className="mb-2 flex items-center gap-2">
-              <span className="text-sm text-white">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="text-sm text-white font-medium">
                 {formatTime(currentTime)}
               </span>
               <CustomSlider
@@ -166,7 +166,9 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
                 value={progress}
                 onChange={handleSeek}
               />
-              <span className="text-sm text-white">{formatTime(duration)}</span>
+              <span className="text-sm text-white font-medium">
+                {formatTime(duration)}
+              </span>
             </div>
 
             <div className="flex items-center justify-between">
@@ -176,7 +178,7 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
                   whileTap={{ scale: 0.9 }}
                 >
                   <Button
-                    className="text-white hover:bg-[#111111d1] hover:text-white"
+                    className="text-white hover:bg-white/20 hover:text-white bg-white/10 border border-gray-700"
                     size="icon"
                     variant="ghost"
                     onClick={togglePlay}
@@ -188,13 +190,13 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
                     )}
                   </Button>
                 </motion.div>
-                <div className="flex items-center gap-x-1">
+                <div className="flex items-center gap-x-2">
                   <motion.div
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
                     <Button
-                      className="text-white hover:bg-[#111111d1] hover:text-white"
+                      className="text-white hover:bg-white/20 hover:text-white bg-white/10 border border-gray-700"
                       size="icon"
                       variant="ghost"
                       onClick={toggleMute}
@@ -203,7 +205,7 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
                     </Button>
                   </motion.div>
 
-                  <div className="w-24">
+                  <div className="w-28">
                     <CustomSlider
                       value={volume * 100}
                       onChange={handleVolumeChange}
@@ -212,7 +214,7 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 {[0.5, 1, 1.5, 2].map((speed) => (
                   <motion.div
                     key={speed}
@@ -223,12 +225,12 @@ function VideoPlayer({ src, className }: { src: string; className?: string }) {
                       size="icon"
                       variant="ghost"
                       className={cn(
-                        "text-white hover:bg-[#111111d1] hover:text-white",
-                        playbackSpeed === speed && "bg-[#111111d1]"
+                        "text-white hover:bg-white/20 hover:text-white bg-white/10 border border-gray-700",
+                        playbackSpeed === speed && "bg-white/20 border-white/30"
                       )}
                       onClick={() => setSpeed(speed)}
                     >
-                      {speed}x
+                      <span className="text-xs font-medium">{speed}x</span>
                     </Button>
                   </motion.div>
                 ))}

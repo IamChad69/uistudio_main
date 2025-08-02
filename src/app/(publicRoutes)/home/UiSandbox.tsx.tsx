@@ -2,23 +2,30 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 
 interface SectionWithMockupProps {}
+
+export const subFeatures = [
+  "Custom components",
+  "Prompt to UI",
+  "Copy to clipboard",
+];
 
 const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
   return (
     <section>
       {/* Heading Section */}
       <div className="text-center py-24">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold  mb-6">
-          Customise, tweak & Deploy
-        </h2>
-        <p className="font-aeonik text-center text-muted-foreground mt-8 font-normal text-md sm:text-lg lg:text-xl whitespace-pre-line t max-w-3xl w-[80%]  mx-auto">
-          Customise and tweak your components to your liking. Add your own
-          variants and deploy them to your projects.
-        </p>
+        <div className="relative z-10 mx-auto max-w-xl space-y-6 text-center md:space-y-12">
+          <h2 className="text-balance text-4xl font-medium lg:text-5xl">
+            Customise, tweak & Deploy
+          </h2>
+          <p className="text-white/60">
+            Our UiScraper integrates directly into your browser. No separate app
+            needed. Just add the extension and go.
+          </p>
+        </div>
       </div>
       <div className="flex flex-col lg:flex-row h-full bg-light-5 border border-border border-light-10 rounded-2xl overflow-hidden">
         {/* Two Column Layout */}
@@ -30,13 +37,24 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
                 Component Sandbox
               </span>
               <h2 className="text-4xl md:text-5xl font-bold ">
-                Customise and tweak{" "}
+                Customise <br />
                 <span className="text-muted-foreground">Components</span>
               </h2>
               <p className="text-lg text-muted-foreground max-w-md">
                 Our extension works with every app site on your computer with no
                 setup necessary. Ui Components are a click away.
               </p>
+            </div>
+            {/* Sub Features List */}
+            <div className="space-y-3 ">
+              {subFeatures.map((feature) => (
+                <div className="flex items-center gap-3" key={feature}>
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="text-sm text-muted-foreground">
+                    {feature}
+                  </span>
+                </div>
+              ))}
             </div>
             <div className="flex flex-row gap-4">
               <Link

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ImagePlus, Type, Pipette, Bookmark } from "lucide-react";
+import { ImagePlus, Type, Pipette, BookmarkPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import MainButton from "./MainButton";
 import FeatureCards from "./FeatureCards";
@@ -50,7 +50,7 @@ const features: Feature[] = [
   {
     id: "bookmarks",
     title: "Bookmark Pages",
-    icon: Bookmark,
+    icon: BookmarkPlus,
     color: "from-orange-500 to-red-500",
     description:
       "Save and organize your favorite pages with powerful bookmark management. Sync across devices, create folders, and search through your collection effortlessly.",
@@ -69,17 +69,17 @@ export default function FeatureSection() {
   return (
     <section className="w-full py-16 md:py-24 ">
       <div className="container px-4 md:px-6 mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-            Explore Our Features
+        <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center md:space-y-8 mb-16">
+          <h2 className="text-balance text-4xl font-medium lg:text-5xl">
+            UI Design Tools for the modern developer
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Navigate through different features using the buttons on the right
-            to explore detailed information and video demos.
+          <p className="text-white/60">
+            Personalised UI design tools. All using your design system. Create
+            custom components and add to your code base.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 max-w-6xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-center max-w-4xl mx-auto">
           <FeatureCards activeFeature={activeFeature} />
           <MainButton
             features={features}

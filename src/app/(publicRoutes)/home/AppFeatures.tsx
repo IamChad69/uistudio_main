@@ -81,9 +81,9 @@ const FeatureList: React.FC<FeatureListProps> = ({
 }) => {
   return (
     <section
-      className={`flex items-center justify-center px-4 md:px-8 lg:px-16 ${className}`}
+      className={`flex items-center py-16 justify-center px-4 md:px-8 lg:px-16 ${className}`}
     >
-      <div className="grid grid-cols-1  max-w-6xl w-full">
+      <div className="grid grid-cols-1 rounded-2xl border border-border max-w-6xl w-full">
         {features.map((feature, index) => (
           <FeatureItem key={feature.id} feature={feature} index={index} />
         ))}
@@ -125,11 +125,11 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({}) => {
   return (
     <section className=" py-16">
       {/* Heading Section */}
-      <div className="text-center mb-16">
-        <h2 className="font-medium text-center whitespace-pre-wrap text-[36px] leading-[40px]  bg-transparent mb-14 lg:text-[48px]">
+      <div className="relative z-10 mx-auto max-w-xl space-y-6 text-center md:space-y-12">
+        <h2 className="text-balance text-4xl font-medium lg:text-5xl">
           Discover Dev Tools
         </h2>
-        <p className="mt-8 font-normal text-md sm:text-lg lg:text-xl whitespace-pre-line text-white/60 max-w-3xl mx-auto px-4">
+        <p className="text-white/60">
           Use UiScraper with powerful dev tools—crafted to streamline your
           workflow.
         </p>
