@@ -45,27 +45,15 @@ const faqs = [
 export function FAQSection() {
   return (
     <section className="w-full py-20" id="faq-section">
+      <div className="relative z-10 mx-auto max-w-xl mb-16 space-y-4 text-center md:space-y-8">
+        <h2 className="text-balance text-4xl font-medium lg:text-5xl">
+          Frequently Asked Questions
+        </h2>
+        <p className="text-white/60">
+          Everything you need to know about UiScraper
+        </p>
+      </div>
       <div className="mx-auto max-w-2xl text-center">
-        <div className="flex justify-center">
-          <div className="inline-flex rounded-full border border-border bg-muted/50 px-4 py-1.5 text-sm font-medium text-muted-foreground backdrop-blur">
-            FAQ
-          </div>
-        </div>
-        {/* Heading */}
-        <motion.div
-          className="space-y-4"
-          initial={{ opacity: 0, y: 20 }}
-          viewport={{ once: true }}
-          whileInView={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="bg-gradient-to-b from-black/60 to-white/60 bg-clip-text text-center text-3xl font-bold tracking-tight md:text-4xl">
-            Frequently Asked Questions
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-lg tracking-tight text-muted-foreground">
-            Everything you need to know about ScrapeStudio
-          </p>
-        </motion.div>
-
         {/* FAQ Accordion */}
         <motion.div
           className="mt-10"
@@ -76,20 +64,22 @@ export function FAQSection() {
         >
           <Accordion
             collapsible
-            className="w-full divide-y divide-white/10"
+            className="w-full divide-y  divide-white/10"
             type="single"
           >
             {faqs.map((faq, index) => (
               <AccordionItem
                 key={index}
-                className="border-b border-white/10 px-4 py-2"
+                className="border-b border-white/10  space-y-4 "
                 value={`item-${index}`}
               >
                 <AccordionTrigger className="hover:no-underline">
-                  <h3 className="text-left tracking-tight">{faq.question}</h3>
+                  <h3 className="font-medium text-[16px] leading-[24px]  text-center transition-all ">
+                    {faq.question}
+                  </h3>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-left text-xl text-muted-foreground">
+                  <p className="text-left text-[16px] leading-[24px] font-normal text-white/60 bg-transparent">
                     {faq.answer}
                   </p>
                 </AccordionContent>

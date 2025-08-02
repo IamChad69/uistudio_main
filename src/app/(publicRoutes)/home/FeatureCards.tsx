@@ -21,7 +21,7 @@ interface FeatureCardsProps {
 
 export default function FeatureCards({ activeFeature }: FeatureCardsProps) {
   return (
-    <div className="flex-1 lg:order-1">
+    <div className="flex-1 max-w-3xl mx-auto lg:order-1">
       <AnimatePresence mode="wait">
         <motion.div
           key={activeFeature.id}
@@ -29,57 +29,31 @@ export default function FeatureCards({ activeFeature }: FeatureCardsProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.4 }}
-          className=" rounded-2xl shadow-2xl border border-border overflow-hidden"
+          className="backdrop-blur-sm rounded-2xl shadow-2xl border  overflow-hidden"
         >
           {/* Header */}
-          <div className="p-6 border-b border-border">
-            <div className="flex items-center gap-4 mb-4">
+          <div className="p-8 ">
+            <div className="flex items-center gap-4 mb-6">
               <div
-                className={`p-3 rounded-xl bg-gradient-to-r ${activeFeature.color}`}
+                className={`p-4 rounded-xl ${activeFeature.color} shadow-lg`}
               >
-                <activeFeature.icon className="w-6 h-6 text-white" />
+                <activeFeature.icon className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-3xl font-bold text-white">
                 {activeFeature.title}
               </h3>
             </div>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed text-lg">
               {activeFeature.description}
             </p>
           </div>
 
-          {/* Video Demo Section */}
-          <div className="p-6">
-            <div className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden group">
-              <VideoPlayer src={activeFeature.videoUrl || ""} />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 mt-4">
-              <button className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
-                <Play className="w-4 h-4" />
-                Watch Demo
-              </button>
-              {activeFeature.demoUrl && (
-                <a
-                  href={activeFeature.demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Try Live Demo
-                </a>
-              )}
-            </div>
-          </div>
-
           {/* Feature Highlights */}
-          <div className="p-6 bg-white/5">
-            <h4 className="text-lg font-semibold text-white mb-4">
+          <div className="p-8 bg-white/5 border-t border-gray-800">
+            <h4 className="text-xl font-semibold text-white mb-6">
               Key Features
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {getFeatureHighlights(activeFeature.id).map(
                 (highlight, index) => (
                   <motion.div
@@ -89,8 +63,8 @@ export default function FeatureCards({ activeFeature }: FeatureCardsProps) {
                     transition={{ delay: index * 0.1 }}
                     className="flex items-center gap-3 text-gray-300"
                   >
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-sm">{highlight}</span>
+                    <div className="w-3 h-3 bg-green-400 rounded-full shadow-sm"></div>
+                    <span className="text-base">{highlight}</span>
                   </motion.div>
                 )
               )}

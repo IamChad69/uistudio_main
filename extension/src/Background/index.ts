@@ -82,11 +82,11 @@ browser.runtime.onInstalled.addListener((): void => {
     contexts: ["page", "selection", "image", "link"],
   });
   // Download Asset or screenshot of the highlighted area
-   browser.contextMenus.create({
-     id: DOWNLOAD_ASSET_MENU_ID,
-     title: "Download Asset",
-     contexts: ["page", "selection", "image", "link"],
-   });
+  browser.contextMenus.create({
+    id: DOWNLOAD_ASSET_MENU_ID,
+    title: "Download Asset",
+    contexts: ["page", "selection", "image", "link"],
+  });
 });
 
 // Listen for context menu clicks
@@ -378,5 +378,18 @@ if (
   });
 }
 
+//make extension open with shortcut also it should have a setting to open extension or chose to open by clicking the icon
+
+
 // Export an empty object to satisfy TypeScript if no other exports are needed
 export {};
+
+//make extension available in service worker contexts
+if (
+  typeof self !== "undefined" &&
+  typeof (self as any).addEventListener === "function"
+) {
+  (self as any).addEventListener("activate", () => {
+    console.log("[uiScraper] Service worker activated");
+  });
+}

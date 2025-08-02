@@ -2,7 +2,7 @@ import React from "react";
 import SectionWithMockup from "./home/Context";
 import { Metadata } from "next";
 import { BasicLayout } from "@/components/Layouts/LandingLayout/LandingLayout";
-import { Features } from "./home/FeatureGrid";
+
 import PricingSection from "./home/PricingSection";
 import { HeroSection } from "./home/HeroSections";
 import { FAQSection } from "./home/FAQSection";
@@ -11,21 +11,12 @@ import AppFeatures from "./home/AppFeatures";
 import ComponentLibrary from "./home/ComponentLibrary";
 import FeatureSection from "./home/FeatureSection";
 import UiSandbox from "./home/UiSandbox.tsx";
-import { BrowserStores } from "./home/Webstores";
 import { Browser } from "./home/Browser";
+import { FeatureTiles } from "./home/Features4";
 
 export const metadata: Metadata = {
   title: "UiScraper",
   description: "UiScraper",
-};
-
-// Example data for the SectionWithMockup component
-const exampleData1 = {
-  title: "Easily Copy HTML & CSS Code from Any Website Element",
-  description:
-    "Instantly Extract and Copy Code from Any Webpage with One Click — Try It Now!",
-  primaryImageSrc: "/hero.png",
-  secondaryImageSrc: "/hero.png",
 };
 
 export default function HomePage() {
@@ -41,7 +32,7 @@ export default function HomePage() {
         <ComponentLibrary />
         <Browser />
         <AppFeatures />
-        <Features />
+        <FeatureTiles />
         <PricingSection />
         <FAQSection />
       </div>
