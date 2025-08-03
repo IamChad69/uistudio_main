@@ -24,7 +24,7 @@ export default function HomePage() {
     <BasicLayout>
       {" "}
       <Header />
-      <div className="min-h-screen mx-auto max-w-7xl px-2 lg:px-12">
+      <div className="min-h-screen mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <HeroSection />
         <SectionWithMockup />
         <FeatureSection />

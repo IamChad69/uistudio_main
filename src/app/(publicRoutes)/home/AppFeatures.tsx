@@ -31,25 +31,25 @@ const FeatureItem: React.FC<FeatureItemProps> = ({ feature, index }) => {
   const isImageOnLeft = finalImagePosition === "left";
 
   return (
-    <div className="-mt-[1px] grid grid-cols-1 md:grid-cols-2 items-center ">
+    <div className="grid grid-cols-1 md:grid-cols-2 items-center">
       {/* Content Section */}
       <div
-        className={`p-8 md:p-12 gap-4 flex flex-col justify-center ${
+        className={`p-8 md:p-12 lg:p-16 space-y-4 flex flex-col justify-center ${
           isImageOnLeft ? "lg:order-2" : "lg:order-1"
         }`}
       >
-        <h2 className="font-aeonik font-medium text-[36px] leading-[40px] ">
+        <h2 className="text-3xl md:text-4xl font-medium">
           {feature.title}
         </h2>
-        <p className="font-aeonik font-normal text-[16px] leading-[24px] text-white/60">
+        <p className="text-base md:text-lg leading-relaxed text-white/60">
           {feature.description}
         </p>
       </div>
 
       {/* Image/Video Section */}
       <div
-        className={` overflow-hidden h-full shadow-lg ${
-          isImageOnLeft ? "lg:order-1 " : "lg:order-2 "
+        className={`overflow-hidden h-full shadow-lg ${
+          isImageOnLeft ? "lg:order-1" : "lg:order-2"
         }`}
       >
         {feature.imageUrl.endsWith(".mp4") ||
@@ -80,15 +80,13 @@ const FeatureList: React.FC<FeatureListProps> = ({
   className = "",
 }) => {
   return (
-    <section
-      className={`flex items-center py-16 justify-center px-4 md:px-8 lg:px-16 ${className}`}
-    >
-      <div className="grid grid-cols-1 rounded-2xl border border-border max-w-6xl w-full">
+    <div className={`w-full ${className}`}>
+      <div className="grid grid-cols-1 rounded-2xl border border-border w-full">
         {features.map((feature, index) => (
           <FeatureItem key={feature.id} feature={feature} index={index} />
         ))}
       </div>
-    </section>
+    </div>
   );
 };
 
@@ -123,13 +121,13 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({}) => {
   ];
 
   return (
-    <section className=" py-16">
+    <section className="py-16 md:py-24">
       {/* Heading Section */}
-      <div className="relative z-10 mx-auto max-w-xl space-y-6 text-center md:space-y-12">
-        <h2 className="text-balance text-4xl font-medium lg:text-5xl">
+      <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center md:space-y-8 mb-16">
+        <h2 className="text-4xl font-medium lg:text-5xl tracking-tight">
           Discover Dev Tools
         </h2>
-        <p className="text-white/60">
+        <p className="text-lg leading-relaxed text-muted-foreground">
           Use UiScraper with powerful dev tools—crafted to streamline your
           workflow.
         </p>
