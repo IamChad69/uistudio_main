@@ -40,13 +40,13 @@ export const Header = () => {
       >
         <div
           className={cn(
-            "mx-auto mt-2 max-w-7xl px-2 lg:px-12 transition-all duration-300",
+            "mx-auto mt-2 max-w-7xl px-4 sm:px-6 lg:px-8 transition-all duration-300",
             isScrolled &&
-              "bg-background/50 max-w-4xl rounded-2xl border backdrop-blur-lg"
+              "bg-background/50 max-w-6xl rounded-2xl border backdrop-blur-lg px-4 sm:px-6 lg:px-8"
           )}
         >
-          <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
-            <div className="flex w-full justify-between lg:w-auto">
+          <div className="relative flex items-center justify-between py-3 lg:py-4">
+            <div className="flex items-center">
               <Link
                 href="/"
                 aria-label="home"
@@ -59,55 +59,70 @@ export const Header = () => {
                   height={24}
                   className="rotate-45"
                 />
-                <span className="text-2xl font-bold">UiScraper</span>
+                <span className="text-xl md:text-2xl font-bold">UiScraper</span>
               </Link>
+            </div>
 
-              <button
-                onClick={() => setMenuState(!menuState)}
-                aria-label={menuState == true ? "Close Menu" : "Open Menu"}
-                className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
+            <div className="hidden lg:flex items-center space-x-8">
+              {menuItems.map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className="text-muted-foreground hover:text-accent-foreground text-sm duration-150"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setMenuState(!menuState)}
+              aria-label={menuState == true ? "Close Menu" : "Open Menu"}
+              className="relative z-20 block cursor-pointer p-2 lg:hidden ml-auto"
+            >
+              <Menu className="group-data-[state=active]:rotate-180 group-data-[state=active]:scale-0 group-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
+              <X className="group-data-[state=active]:rotate-0 group-data-[state=active]:scale-100 group-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
+            </button>
+
+            <div className="hidden lg:block">
+              <Button
+                asChild
+                size="sm"
+                className="ml-4"
               >
-                <Menu className="group-data-[state=active]:rotate-180 group-data-[state=active]:scale-0 group-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
-                <X className="group-data-[state=active]:rotate-0 group-data-[state=active]:scale-100 group-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
-              </button>
+                <Link href="#">
+                  <span>Get Started</span>
+                </Link>
+              </Button>
             </div>
 
-            <div className="absolute inset-0 m-auto hidden size-fit lg:block">
-              <ul className="flex gap-8 text-sm">
-                {menuItems.map((item, index) => (
-                  <li key={index}>
-                    <Link
-                      href={item.href}
-                      className="text-muted-foreground hover:text-accent-foreground block duration-150"
-                    >
-                      <span>{item.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-background group-data-[state=active]:block lg:group-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
-              <div className="lg:hidden">
-                <ul className="space-y-6 text-base">
+            {/* Mobile menu dropdown */}
+            <div className={cn(
+              "fixed inset-x-0 top-[72px] z-10 bg-background rounded-b-xl border-x border-b p-6 shadow-lg",
+              menuState ? "block" : "hidden"
+            )}>
+              <nav className="mt-2 mb-6">
+                <ul className="space-y-4">
                   {menuItems.map((item, index) => (
                     <li key={index}>
                       <Link
                         href={item.href}
-                        className="text-muted-foreground hover:text-accent-foreground block duration-150"
+                        className="text-muted-foreground hover:text-accent-foreground block duration-150 text-base"
+                        onClick={() => setMenuState(false)}
                       >
-                        <span>{item.name}</span>
+                        {item.name}
                       </Link>
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+              </nav>
+              
+              <div className="flex flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0">
                 <Button
                   asChild
                   variant="outline"
                   size="sm"
-                  className={cn(isScrolled && "lg:hidden")}
+                  className="w-full sm:w-auto"
                 >
                   <Link href="#">
                     <span>Login</span>
@@ -116,19 +131,10 @@ export const Header = () => {
                 <Button
                   asChild
                   size="sm"
-                  className={cn(isScrolled && "lg:hidden")}
+                  className="w-full sm:w-auto"
                 >
                   <Link href="#">
                     <span>Sign Up</span>
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="sm"
-                  className={cn(isScrolled ? "lg:inline-flex" : "hidden")}
-                >
-                  <Link href="#">
-                    <span>Get Started</span>
                   </Link>
                 </Button>
               </div>

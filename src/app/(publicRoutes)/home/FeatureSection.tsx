@@ -67,19 +67,19 @@ export default function FeatureSection() {
   };
 
   return (
-    <section className="w-full py-16 md:py-24 ">
-      <div className="container px-4 md:px-6 mx-auto">
+    <section className="w-full py-16 md:py-24">
+      <div className="w-full">
         <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center md:space-y-8 mb-16">
-          <h2 className="text-balance text-4xl font-medium lg:text-5xl">
+          <h2 className="text-4xl font-medium lg:text-5xl tracking-tight">
             UI Design Tools for the modern developer
           </h2>
-          <p className="text-white/60">
+          <p className="text-lg leading-relaxed text-muted-foreground">
             Personalised UI design tools. All using your design system. Create
             custom components and add to your code base.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-center max-w-4xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8 items-center justify-center max-w-4xl mx-auto">
           <FeatureCards activeFeature={activeFeature} />
           <MainButton
             features={features}

@@ -247,14 +247,14 @@ const LogoComponent = ({ logo }: { logo: LogoItem }) => {
 
 export const LogoCloud = () => {
   return (
-    <div className="max-w-4xl  mx-auto">
+    <div className="w-full mx-auto">
       <div className="flex flex-col items-center md:flex-row">
         <div className="inline md:max-w-44 md:border-r md:pr-6">
-          <p className="text-end text-sm">
+          <p className="text-sm text-muted-foreground">
             Built on top of the most popular tools
           </p>
         </div>
-        <div className="relative py-12 md:w-[calc(100%-11rem)]">
+        <div className="relative py-8 md:py-12 md:w-[calc(100%-11rem)]">
           <InfiniteSlider durationOnHover={20} duration={40} gap={112}>
             {logoData.map((logo) => (
               <LogoComponent key={logo.id} logo={logo} />
