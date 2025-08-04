@@ -67,12 +67,12 @@ const ComponentLibrary: React.FC<ComponentLibraryProps> = ({}) => {
           </div>
 
           {/* Right Column - Video Demo */}
-          <div className="bg-muted overflow-hidden shadow-lg">
+          <div className="bg-muted overflow-hidden shadow-lg h-full">
             <video
               autoPlay={true}
               loop={true}
               muted={true}
-              className="w-full h-full object-cover aspect-video opacity-80 dark:opacity-90"
+              className="w-full h-full object-cover lg:aspect-auto aspect-video opacity-80 dark:opacity-90"
               src="https://myhhjl9xib.ufs.sh/f/ueACguBO3qEXuuKXk5BO3qEX8zmS5D6YGluptwTFgoeNhHbK"
             />
           </div>

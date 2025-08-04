@@ -38,7 +38,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased dark`}
         lang="en"
       >
-        <body className="min-h-screen bg-background">
+        <body suppressHydrationWarning className="min-h-screen bg-background">
           <Providers>{children}</Providers>
         </body>
       </html>

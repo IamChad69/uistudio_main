@@ -56,9 +56,9 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
           </div>
 
           {/* Right Column - Video Demo */}
-          <div className="bg-muted overflow-hidden shadow-lg">
+          <div className="bg-muted overflow-hidden shadow-lg h-full">
             <VideoPlayer 
-              className="w-full h-full object-cover aspect-video"
+              className="w-full h-full object-cover lg:aspect-auto aspect-video"
               src="https://myhhjl9xib.ufs.sh/f/ueACguBO3qEXuuKXk5BO3qEX8zmS5D6YGluptwTFgoeNhHbK" 
             />
           </div>

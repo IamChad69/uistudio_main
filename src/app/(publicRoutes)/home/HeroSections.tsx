@@ -44,21 +44,20 @@ const demoData = {
 
 function HeroSection() {
   return (
-    <div className="w-full flex flex-col justify-center relative py-16 md:py-24">
+    <div className="w-full flex flex-col justify-center relative ">
       <div className="w-full">
-        <div className="grid grid-cols-1 gap-8 md:gap-12 items-center lg:grid-cols-5">
+        <div className="grid grid-cols-1 mt-16 md:mt-24 gap-8 md:gap-12 items-center lg:grid-cols-5">
           <div className="flex gap-6 flex-col md:mx-auto md:max-w-xl md:text-center lg:text-left lg:mx-0 lg:max-w-none lg:col-span-2">
             <div className="md:flex md:justify-center lg:justify-start">
               <Badge variant="outline">We&apos;re live!</Badge>
             </div>
             <div className="flex gap-4 flex-col">
               <h1 className="text-4xl md:text-5xl lg:text-6xl lg:text-left tracking-tight font-medium">
-                Context aware React-code extraction & Generative AI
+                 Turn any site into your next design asset.
               </h1>
               <p className="text-lg leading-relaxed text-muted-foreground lg:text-left">
-                Extract and generate beautiful, accessible React + Tailwind CSS
-                components from any website. Build your custom UI library
-                without writing code.
+                 Effortlessly turn real websites into editable, production-ready UI components.
+Extract what inspires you and instantly generate beautiful, accessible designs—no code required.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row md:justify-center lg:justify-start gap-4">

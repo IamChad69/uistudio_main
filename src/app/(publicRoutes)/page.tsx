@@ -13,6 +13,8 @@ import FeatureSection from "./home/FeatureSection";
 import UiSandbox from "./home/UiSandbox.tsx";
 import { Browser } from "./home/Browser";
 import { FeatureTiles } from "./home/Features4";
+import Testimonials from "./home/Testimonials";
+import Howto from "./home/Howto";
 
 export const metadata: Metadata = {
   title: "UiScraper",
@@ -27,6 +29,7 @@ export default function HomePage() {
       <div className="min-h-screen mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <HeroSection />
         <SectionWithMockup />
+        <Howto />
         <FeatureSection />
         <UiSandbox />
         <ComponentLibrary />
@@ -34,6 +37,7 @@ export default function HomePage() {
         <AppFeatures />
         <FeatureTiles />
         <PricingSection />
+        <Testimonials />
         <FAQSection />
       </div>
     </BasicLayout>

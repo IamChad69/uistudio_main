@@ -53,7 +53,7 @@ const Hero7 = ({
   },
 }: Hero7Props) => {
   return (
-    <section className="">
+    <section className="py-8 md:py-12">
       <div className="container text-center">
         <div className=" gap-4 flex flex-col sm:flex-row">
           <div>

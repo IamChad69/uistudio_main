@@ -14,7 +14,7 @@ export const subFeatures = [
 
 const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-8 md:py-12">
       {/* Heading Section */}
       <div className="mb-16">
         <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center md:space-y-8">
@@ -68,12 +68,12 @@ const SectionWithMockup: React.FC<SectionWithMockupProps> = ({}) => {
           </div>
 
           {/* Right Column - Video Demo */}
-          <div className="bg-muted overflow-hidden shadow-lg">
+          <div className="bg-muted overflow-hidden shadow-lg h-full">
             <video
               autoPlay={true}
               loop={true}
               muted={true}
-              className="w-full h-full object-cover aspect-video opacity-80 dark:opacity-90"
+              className=" w-full h-full object-cover lg:aspect-auto aspect-video opacity-80 dark:opacity-90"
               src="https://myhhjl9xib.ufs.sh/f/ueACguBO3qEXuuKXk5BO3qEX8zmS5D6YGluptwTFgoeNhHbK"
             />
           </div>
