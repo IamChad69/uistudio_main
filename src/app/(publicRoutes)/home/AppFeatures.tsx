@@ -121,7 +121,7 @@ const AppFeatures: React.FC<AppFeaturesProps> = ({}) => {
   ];
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-8 md:py-12">
       {/* Heading Section */}
       <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center md:space-y-8 mb-16">
         <h2 className="text-4xl font-medium lg:text-5xl tracking-tight">

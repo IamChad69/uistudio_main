@@ -68,7 +68,7 @@ const MainButton = memo(function MainButton({
                       : "text-white/60 hover:text-gray-300 hover:bg-white/20"
                   }`}
                   role="tab"
-                  aria-selected={isActive}
+                  {...(isActive ? { "aria-selected": "true" } : { "aria-selected": "false" })}
                   aria-label={`${feature.title} feature`}
                   tabIndex={0}
                 >
