@@ -2,9 +2,7 @@ import {
   Eye,
   Code2,
   Library,
-  Save,
   Pipette,
-  HelpCircle,
   PanelRightClose,
   Puzzle,
 } from "lucide-react";

@@ -131,6 +131,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  .font-instrument-serif {
+    font-family: var(--font-instrument-serif);
+    letter-spacing: -0.06em;
+  }
 }
 
 @layer utilities {

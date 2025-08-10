@@ -140,7 +140,12 @@ export const AppearanceSettings: React.FC = () => {
           Choose how element borders appear when highlighted
         </p>
         <div style={styles.optionsContainer}>
+          <label htmlFor="border-style-select" style={{ display: "none" }}>
+            Border Style
+          </label>
           <select
+            id="border-style-select"
+            aria-label="Border Style"
             value={selectedBorderStyle}
             onChange={(e) => handleBorderStyleSelect(e.target.value)}
             style={styles.dropdown}
@@ -291,6 +296,9 @@ const ColorOption: React.FC<ColorOptionProps> = ({
 
   return (
     <button
+      type="button"
+      aria-label={`Select color ${color}`}
+      title={`Select color ${color}`}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

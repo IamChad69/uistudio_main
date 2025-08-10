@@ -11,51 +11,51 @@ interface Feature {
   title: string;
   icon: LucideIcon;
   color: string;
+  tag: string;
   description: string;
-  videoUrl?: string;
-  demoUrl?: string;
+  imageSrc: string;
 }
 
 const features: Feature[] = [
   {
     id: "assets",
-    title: "Ready-to-Use UI Blocks",
+    title: "Asset Downloader",
     icon: ImagePlus,
     color: "from-purple-500 to-pink-500",
+    tag: "Download website assets in seconds",
     description:
-      "Browse through our extensive collection of pre-built UI blocks designed with shadcn/ui. Each block is carefully crafted to be responsive, accessible, and easily customizable. Simply copy and paste the code into your project.",
-    videoUrl: "/demos/ui-blocks-demo.mp4",
-    demoUrl: "https://demo.uiscraper.com/ui-blocks",
+      "Extract deeply embedded assets like background images and icons without digging through source code. Perfect for redesigns, UI inspiration, and reuse across projects. One click to download, tag, and save.",
+    imageSrc: "/asset_downloader.png",
   },
   {
     id: "typography",
-    title: "Tailwind CSS & TypeScript",
+    title: "Font Extractor",
     icon: Type,
     color: "from-blue-500 to-cyan-500",
+    tag: "Instantly detect and copy font styles from any website.",
     description:
       "Built with modern technologies for type safety and utility-first styling. Enjoy better developer experience with IntelliSense, autocomplete, and compile-time error checking.",
-    videoUrl: "/demos/typescript-demo.mp4",
-    demoUrl: "https://demo.uiscraper.com/typescript",
+    imageSrc: "/assets/images/font-extractor.png",
   },
   {
     id: "colors",
     title: "Color Picker",
     icon: Pipette,
     color: "from-green-500 to-emerald-500",
+    tag: "Extract Website Colors Instantly — HEX, RGB, HSL & More",
     description:
       "Advanced color picking tool that works on any website. Extract colors, create palettes, and maintain a history of your selections with support for multiple color formats.",
-    videoUrl: "/demos/color-picker-demo.mp4",
-    demoUrl: "https://demo.uiscraper.com/color-picker",
+    imageSrc: "/assets/images/color-picker.png",
   },
   {
     id: "bookmarks",
     title: "Bookmark Pages",
     icon: BookmarkPlus,
     color: "from-orange-500 to-red-500",
+    tag: "Save & Organize Your Design Inspiration.",
     description:
       "Save and organize your favorite pages with powerful bookmark management. Sync across devices, create folders, and search through your collection effortlessly.",
-    videoUrl: "/demos/bookmarks-demo.mp4",
-    demoUrl: "https://demo.uiscraper.com/bookmarks",
+    imageSrc: "/assets/images/bookmark-pages.png",
   },
 ];
 
@@ -79,13 +79,16 @@ export default function FeatureSection() {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-center justify-center max-w-4xl mx-auto">
-          <FeatureCards activeFeature={activeFeature} />
-          <MainButton
-            features={features}
-            activeFeatureId={activeFeature.id}
-            onFeatureSelect={handleFeatureSelect}
-          />
+        <div className="flex flex-col lg:flex-row gap-8 items-center justify-center max-w-7xl mx-auto">
+          
+          <FeatureCards activeFeature={activeFeature}  />
+          <div className="lg:order-2 mb-8 lg:mb-0">
+            <MainButton
+              features={features}
+              activeFeatureId={activeFeature.id}
+              onFeatureSelect={handleFeatureSelect}
+            />
+          </div>
         </div>
       </div>
     </section>

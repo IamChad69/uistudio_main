@@ -1,6 +1,4 @@
 import { SVGProps } from "react";
-import { InfiniteSlider } from "./inifinite-slider";
-import Image from "next/image";
 
 function TypeScriptIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -60,206 +58,64 @@ function ReactIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function NextjsIcon() {
+function LucideIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <div className="relative size-10">
-      <Image fill alt="Next.js" className="object-contain" src="next.svg" />
-    </div>
-  );
-}
-
-function ShadcnIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M12 2L2 7L12 12L22 7L12 2Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M2 17L12 22L22 17"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M2 12L12 17L22 12"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M18.483 1.123a1.09 1.09 0 0 0-.752.362 1.09 1.09 0 0 0 .088 1.54 11.956 11.956 0 0 1 4 8.946 7.62 7.62 0 0 1-7.637 7.636 7.62 7.62 0 0 1-7.637-7.636 3.255 3.255 0 0 1 3.273-3.273c1.82 0 3.273 1.45 3.273 3.273a1.09 1.09 0 0 0 1.09 1.09 1.09 1.09 0 0 0 1.092-1.09c0-3-2.455-5.455-5.455-5.455s-5.454 2.455-5.454 5.455c0 5.408 4.408 9.818 9.818 9.818 5.41 0 9.818-4.41 9.818-9.818A14.16 14.16 0 0 0 19.272 1.4a1.09 1.09 0 0 0-.789-.277ZM9.818 2.15C4.408 2.151 0 6.561 0 11.97a14.16 14.16 0 0 0 4.8 10.637 1.09 1.09 0 0 0 1.54-.096 1.09 1.09 0 0 0-.095-1.54 11.957 11.957 0 0 1-4.063-9 7.62 7.62 0 0 1 7.636-7.637 7.62 7.62 0 0 1 7.637 7.636 3.256 3.256 0 0 1-3.273 3.273 3.256 3.256 0 0 1-3.273-3.273 1.09 1.09 0 0 0-1.09-1.09 1.09 1.09 0 0 0-1.092 1.09c0 3 2.455 5.455 5.455 5.455s5.454-2.455 5.454-5.455c0-5.408-4.408-9.818-9.818-9.818z" />
     </svg>
   );
 }
 
-function FramerMotionIcon(props: SVGProps<SVGSVGElement>) {
+function RadixIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M12 2L2 7V17L12 22L22 17V7L12 2Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 22V12"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M22 7L12 12L2 7"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M11.52 24a7.68 7.68 0 0 1-7.68-7.68 7.68 7.68 0 0 1 7.68-7.68V24Zm0-24v7.68H3.84V0h7.68Zm4.8 7.68a3.84 3.84 0 1 1 0-7.68 3.84 3.84 0 0 1 0 7.68Z" />
     </svg>
   );
 }
-
-// Logo data structure
-interface LogoItem {
-  id: string;
-  name: string;
-  type: "svg" | "image";
-  component?: React.ComponentType<SVGProps<SVGSVGElement>>;
-  src?: string;
-  alt: string;
-  height: number;
-  width?: number;
-  className?: string;
-}
-
-const logoData: LogoItem[] = [
-  {
-    id: "typescript",
-    name: "TypeScript",
-    type: "svg",
-    component: TypeScriptIcon,
-    alt: "TypeScript Logo",
-    height: 20,
-    className: "mx-auto h-5 w-fit",
-  },
-  {
-    id: "tailwind",
-    name: "Tailwind CSS",
-    type: "svg",
-    component: TailwindCSSIcon,
-    alt: "Tailwind CSS Logo",
-    height: 16,
-    className: "mx-auto h-4 w-fit",
-  },
-  {
-    id: "react",
-    name: "React",
-    type: "svg",
-    component: ReactIcon,
-    alt: "React Logo",
-    height: 20,
-    className: "mx-auto h-5 w-fit",
-  },
-  {
-    id: "nextjs",
-    name: "Next.js",
-    type: "svg",
-    component: NextjsIcon,
-    alt: "Next.js Logo",
-    height: 20,
-    className: "mx-auto h-5 w-fit",
-  },
-  {
-    id: "shadcn",
-    name: "Shadcn/ui",
-    type: "svg",
-    component: ShadcnIcon,
-    alt: "Shadcn/ui Logo",
-    height: 20,
-    className: "mx-auto h-5 w-fit",
-  },
-  {
-    id: "framer-motion",
-    name: "Framer Motion",
-    type: "svg",
-    component: FramerMotionIcon,
-    alt: "Framer Motion Logo",
-    height: 20,
-    className: "mx-auto h-5 w-fit",
-  },
-  {
-    id: "openai",
-    name: "OpenAI",
-    type: "image",
-    src: "https://html.tailus.io/blocks/customers/openai.svg",
-    alt: "OpenAI Logo",
-    height: 24,
-    className: "mx-auto h-6 w-fit dark:invert",
-  },
-];
-
-// Logo component that renders either SVG or image
-const LogoComponent = ({ logo }: { logo: LogoItem }) => {
-  if (logo.type === "svg" && logo.component) {
-    const Component = logo.component;
-    return (
-      <div className="flex">
-        <Component
-          className={logo.className}
-          height={logo.height}
-          width={logo.width || "auto"}
-        />
-      </div>
-    );
-  }
-
-  if (logo.type === "image" && logo.src) {
-    return (
-      <div className="flex">
-        <img
-          className={logo.className}
-          src={logo.src}
-          alt={logo.alt}
-          height={logo.height}
-          width={logo.width || "auto"}
-        />
-      </div>
-    );
-  }
-
-  return null;
-};
 
 export const LogoCloud = () => {
   return (
-    <div className="w-full mx-auto">
-      <div className="flex flex-col items-center md:flex-row">
-        <div className="inline md:max-w-44 md:border-r md:pr-6">
-          <p className="text-sm text-muted-foreground">
+    <div className="w-full mx-auto max-w-[990px] px-4">
+      <div className="flex flex-col items-center justify-center gap-6 md:flex-row md:items-center ">
+        {/* <div className="flex items-center text-center md:text-left md:self-stretch md:h-full md:pr-6 md:border-r md:max-w-[14rem]">
+          <p className="text-sm text-muted-foreground leading-normal">
             Built on top of the most popular tools
           </p>
-        </div>
-        <div className="relative py-8 md:py-12 md:w-[calc(100%-11rem)]">
-          <InfiniteSlider durationOnHover={20} duration={40} gap={112}>
-            {logoData.map((logo) => (
-              <LogoComponent key={logo.id} logo={logo} />
-            ))}
-          </InfiniteSlider>
+        </div> */}
+        <div className="flex items-center justify-center md:justify-center">
+          <div className="-space-x-2 sm:-space-x-3 md:-space-x-4 inline-flex items-center justify-center">
+            <div
+              className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-14 bg-[rgb(8,126,164)]"
+              title="React"
+            >
+              <ReactIcon className="size-3 sm:size-4 md:size-5 lg:size-6" />
+            </div>
+            <div
+              className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-14 bg-[rgb(49,120,198)] [mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)] [webkit-mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)]"
+              title="TypeScript"
+            >
+              <TypeScriptIcon className="size-3 sm:size-4 md:size-5 lg:size-6" />
+            </div>
+            <div
+              className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-14 bg-[rgb(0,188,255)] [mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)] [webkit-mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)]"
+              title="Tailwind CSS"
+            >
+              <TailwindCSSIcon className="size-3 sm:size-4 md:size-5 lg:size-6" />
+            </div>
+            <div
+              className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-14 bg-[rgb(246,115,115)] [mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)] [webkit-mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)]"
+              title="Lucide"
+            >
+              <LucideIcon className="size-3 sm:size-4 md:size-5 lg:size-6" />
+            </div>
+            <div
+              className="inline-flex size-8 items-center justify-center rounded-full text-white sm:size-10 md:size-12 lg:size-14 bg-[rgb(0,0,0)] [mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)] [webkit-mask-image:radial-gradient(28px_at_-17px_50%,_transparent_99%,_white_100%)]"
+              title="Radix UI"
+            >
+              <RadixIcon className="size-3 sm:size-4 md:size-5 lg:size-6" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
