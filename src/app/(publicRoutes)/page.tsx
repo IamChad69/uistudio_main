@@ -10,6 +10,7 @@ import { Header } from "./home/NavBar";
 import AppFeatures from "./home/AppFeatures";
 import ComponentLibrary from "./home/ComponentLibrary";
 import FeatureSection from "./home/FeatureSection";
+import RealCostSection from "./home/RealCostSection";
 import UiSandbox from "./home/UiSandbox.tsx";
 import { Browser } from "./home/Browser";
 import { FeatureTiles } from "./home/Features4";
@@ -28,8 +29,9 @@ export default function HomePage() {
       <Header />
       <div className="min-h-screen mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <HeroSection />
-        <SectionWithMockup />
         <Howto />
+        <SectionWithMockup />
+        <RealCostSection />
         <FeatureSection />
         <UiSandbox />
         <ComponentLibrary />

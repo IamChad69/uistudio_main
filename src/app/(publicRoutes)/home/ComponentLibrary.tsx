@@ -3,7 +3,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ChevronRight, MoveRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface ComponentLibraryProps {}
 export const subFeatures = [

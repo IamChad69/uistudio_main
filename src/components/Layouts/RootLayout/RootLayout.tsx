@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "@/app/globals.css";
 
 import { ClerkProvider } from "@clerk/nextjs";
@@ -16,6 +16,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export const metadata: Metadata = {
   title: "UI Studio - Build Better UIs",
   description: "Create, extract, and manage UI components with AI assistance",
@@ -27,6 +33,7 @@ export const metadata: Metadata = {
 export function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
+      waitlistUrl="/waitlist"
       appearance={{
         elements: {
           rootBox: "bg-background",
@@ -35,7 +42,7 @@ export function RootLayout({ children }: { children: React.ReactNode }) {
     >
       <html
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased dark`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} font-sans antialiased dark`}
         lang="en"
       >
         <body suppressHydrationWarning className="min-h-screen bg-background">
